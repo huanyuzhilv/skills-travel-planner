@@ -6,7 +6,7 @@
 **关键词**：AI 路书生成、AI 行程单、定制游行路书、travel itinerary generator、roadbook generator、Agent Skill、小红书配图、LLM 文案润色。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Website](https://img.shields.io/badge/Website-skills--travel--planner.vercel.app-646cff)](https://skills-travel-planner.vercel.app)
+[![Website](https://img.shields.io/badge/Website-GitHub%20Pages-646cff)](https://huanyuzhilv.github.io/skills-travel-planner/)
 
 ## 特性
 
