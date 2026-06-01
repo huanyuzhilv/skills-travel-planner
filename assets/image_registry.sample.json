@@ -1,0 +1,78 @@
+{
+  "sources": {
+    "xiaohongshu": {
+      "poi": {
+        "poi_moergele_001": [
+          "https://example.com/xhs-moergele-cover.jpg",
+          "https://example.com/xhs-moergele-sunset.jpg"
+        ]
+      },
+      "keyword": {
+        "莫尔格勒河": [
+          "https://example.com/xhs-moergele-keyword.jpg"
+        ],
+        "黑山头骑马": [
+          "https://example.com/xhs-heishantou-horse.jpg"
+        ]
+      }
+    },
+    "ctrip": {
+      "hotel": {
+        "hotel_kai_jing_001": {
+          "name": "呼伦贝尔凯景嘉华酒店",
+          "description": "携程酒店介绍文案，可由内部采集流程写入。",
+          "address": "海拉尔区示例地址",
+          "rating": "携程4星",
+          "roomCount": 226,
+          "roomSize": "约30平方米",
+          "sourceUrl": "https://hotels.ctrip.com/example",
+          "images": [
+            "https://example.com/ctrip-kai-jing-cover.jpg",
+            "https://example.com/ctrip-kai-jing-room.jpg"
+          ]
+        },
+        "呼伦贝尔凯景嘉华酒店": {
+          "images": [
+            "https://example.com/ctrip-kai-jing-name-match.jpg"
+          ]
+        }
+      }
+    },
+    "fliggy": {
+      "hotel": {
+        "hotel_kai_jing_001": {
+          "description": "飞猪酒店介绍文案作为携程缺失时的备选。",
+          "images": [
+            "https://example.com/fliggy-kai-jing-cover.jpg"
+          ]
+        }
+      }
+    },
+    "manual": {
+      "poi": {
+        "poi_gugong_001": [
+          "https://example.com/manual-poi-gugong-main.jpg",
+          "https://example.com/manual-poi-gugong-side.jpg"
+        ]
+      },
+      "hotel": {
+        "hotel_bei_jing_nan_001": [
+          "https://example.com/manual-hotel-001-cover.jpg",
+          "https://example.com/manual-hotel-001-room.jpg"
+        ]
+      }
+    }
+  },
+  "hotel": {
+    "hotel_bei_jing_nan_001": [
+      "https://example.com/legacy-hotel-001-cover.jpg",
+      "https://example.com/legacy-hotel-001-room.jpg"
+    ]
+  },
+  "poi": {
+    "poi_gugong_001": [
+      "https://example.com/legacy-poi-gugong-main.jpg",
+      "https://example.com/legacy-poi-gugong-side.jpg"
+    ]
+  }
+}

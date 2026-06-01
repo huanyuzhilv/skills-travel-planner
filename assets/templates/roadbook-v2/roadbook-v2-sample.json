@@ -1,0 +1,542 @@
+{
+  "meta": {
+    "version": "2.0",
+    "createdAt": "2026-05-12T10:00:00Z",
+    "updatedAt": "2026-05-12T10:00:00Z"
+  },
+  "cover": {
+    "backgroundImage": {
+      "alternates": [
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Hopetoun_falls.jpg/1280px-Hopetoun_falls.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Example.jpg/1280px-Example.jpg"
+      ],
+      "slotLabel": "封面 · 目的地意象图"
+    },
+    "title": "呼伦贝尔 · 7天6晚亲子深度游",
+    "subtitle": "2026年8月 | 穿越草原与湿地的自然之旅",
+    "logo": [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/1280px-PNG_transparency_demonstration_1.png",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Gull_portrait_ca_usa.jpg/1280px-Gull_portrait_ca_usa.jpg"
+    ]
+  },
+  "components": [
+    {
+      "type": "highlights",
+      "id": "highlights-001",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Dhaulagiri_from_shining.jpg/1280px-Dhaulagiri_from_shining.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1280px-Good_Food_Display_-_NCI_Visuals_Online.jpg"
+        ],
+        "title": "行程亮点",
+        "content": "深入呼伦贝尔大草原腹地，体验最原生态的游牧文化。从海拉尔出发，穿越莫日格勒河、额尔古纳湿地、室韦边境小镇，直至满洲里异域风情城市，一路领略草原、森林、湿地、河流的壮美自然画卷。",
+        "items": [
+          "莫日格勒河畔策马奔腾，体验蒙古族马背文化",
+          "额尔古纳亚洲第一湿地，登高俯瞰壮美河曲",
+          "室韦俄罗斯民族乡，感受中俄边境风情",
+          "黑山头日落骑马，草原最美黄昏",
+          "满洲里套娃广场，亲子互动乐园",
+          "访问牧民家庭，挤牛奶、搭蒙古包",
+          "呼伦湖畔野餐，品尝正宗手扒肉"
+        ]
+      }
+    },
+    {
+      "type": "itinerary",
+      "id": "itinerary-001",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1280px-Image_created_with_a_mobile_phone.png",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Iguazu_Falls.jpg/1280px-Iguazu_Falls.jpg"
+        ],
+        "title": "行程概览",
+        "style": "table",
+        "items": [
+          {
+            "day": 1,
+            "date": "8月10日",
+            "title": "海拉尔集合",
+            "locations": "海拉尔",
+            "transport": "飞机抵达",
+            "distance": "-",
+            "accommodation": "海拉尔大饭店",
+            "meals": "晚餐"
+          },
+          {
+            "day": 2,
+            "date": "8月11日",
+            "title": "草原穿越",
+            "locations": "莫日格勒河 → 额尔古纳",
+            "transport": "越野车",
+            "distance": "160km",
+            "accommodation": "额尔古纳木屋酒店",
+            "meals": "早/午/晚"
+          },
+          {
+            "day": 3,
+            "date": "8月12日",
+            "title": "湿地探秘",
+            "locations": "额尔古纳湿地 → 白桦林 → 恩和",
+            "transport": "越野车",
+            "distance": "120km",
+            "accommodation": "恩和木刻楞民宿",
+            "meals": "早/午/晚"
+          },
+          {
+            "day": 4,
+            "date": "8月13日",
+            "title": "边境风情",
+            "locations": "恩和 → 室韦 → 临江",
+            "transport": "越野车",
+            "distance": "80km",
+            "accommodation": "临江屯民宿",
+            "meals": "早/午/晚"
+          },
+          {
+            "day": 5,
+            "date": "8月14日",
+            "title": "黑山头骑马",
+            "locations": "临江 → 黑山头",
+            "transport": "越野车",
+            "distance": "200km",
+            "accommodation": "黑山头蒙古包营地",
+            "meals": "早/午/晚"
+          },
+          {
+            "day": 6,
+            "date": "8月15日",
+            "title": "满洲里异域风",
+            "locations": "黑山头 → 呼伦湖 → 满洲里",
+            "transport": "越野车",
+            "distance": "180km",
+            "accommodation": "满洲里套娃主题酒店",
+            "meals": "早/午/晚"
+          },
+          {
+            "day": 7,
+            "date": "8月16日",
+            "title": "返程",
+            "locations": "满洲里 → 海拉尔",
+            "transport": "越野车+飞机",
+            "distance": "200km",
+            "accommodation": "-",
+            "meals": "早餐"
+          }
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-001",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Phoenix_Islands_-_panoramio.jpg/1280px-Phoenix_Islands_-_panoramio.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Clouds_over_the_Atlantic_Ocean.jpg/1280px-Clouds_over_the_Atlantic_Ocean.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day1 8月10日",
+        "theme": "海拉尔集合 · 草原之旅启程",
+        "description": "今日为集合日，各地团友陆续抵达'草原明珠'海拉尔。我们的工作人员将在机场/火车站接站，送您至酒店办理入住。如果您到达较早，可以自行游览海拉尔市区：成吉思汗广场感受蒙元文化、呼伦贝尔古城品尝当地美食。晚间举行行程说明会暨欢迎晚宴，品尝地道涮羊肉。",
+        "topImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cumulus_clouds_over_the_Atlantic.jpg/1280px-Cumulus_clouds_over_the_Atlantic.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Water_drop_impact_on_a_water-surface_-_2.jpg/1280px-Water_drop_impact_on_a_water-surface_-_2.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Copenhagen_-_the_little_mermaid_statue_-_2013.jpg/1280px-Copenhagen_-_the_little_mermaid_statue_-_2013.jpg"
+          ],
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Eiffel_tower_from_champs_de_mars.jpg/1280px-Eiffel_tower_from_champs_de_mars.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Big_Ben_Clock_Tower_London-may_2007.jpg/1280px-Big_Ben_Clock_Tower_London-may_2007.jpg"
+          ]
+        ],
+        "sideImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Beijing_national_stadium.jpg/1280px-Beijing_national_stadium.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg"
+        ],
+        "bottomImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Partial_solar_eclipse_in_Helsinki_2008.jpg/1280px-Partial_solar_eclipse_in_Helsinki_2008.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/20100726_Kalamitsi_Beach_Ionian_Sea_Lefkada_island_Greece.jpg/1280px-20100726_Kalamitsi_Beach_Ionian_Sea_Lefkada_island_Greece.jpg"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-002",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Ronda_la_vieja.jpg/1280px-Ronda_la_vieja.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kluane_National_Park_1983.jpg/1280px-Kluane_National_Park_1983.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day2 8月11日",
+        "theme": "穿越草原 · 莫日格勒河",
+        "description": "早餐后乘越野车出发，告别城市驶入辽阔草原。途经被老舍先生誉为'天下第一曲水'的莫日格勒河，登高远眺河流九曲十八弯的壮美景象。午餐享用草原野炊烤肉。下午继续穿越草原腹地，沿途可见成群牛羊，抵达额尔古纳后入住特色木屋酒店，晚餐品尝正宗烤全羊。",
+        "topImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Kiyomizu-dera%2C_Kyoto%2C_Japan_-_panoramio.jpg/1280px-Kiyomizu-dera%2C_Kyoto%2C_Japan_-_panoramio.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Balaton_Hungary_Landscape.jpg/1280px-Balaton_Hungary_Landscape.jpg"
+          ],
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Broadway_tower_edit.jpg/1280px-Broadway_tower_edit.jpg",
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Glasgow_university.jpg/1280px-Glasgow_university.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Peacock_Butterfly_Inari.jpg/1280px-Peacock_Butterfly_Inari.jpg"
+          ]
+        ],
+        "sideImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Fire_breathing_2_Luc_Viatour.jpg/1280px-Fire_breathing_2_Luc_Viatour.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Museum_of_Contemporary_Art_Belgrade.jpg/1280px-Museum_of_Contemporary_Art_Belgrade.jpg"
+        ],
+        "bottomImages": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Tulip_Streaked_Broken_by_Virus.jpg/1280px-Tulip_Streaked_Broken_by_Virus.jpg",
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/BMW_I8_Concept_IAA_2011.jpg/1280px-BMW_I8_Concept_IAA_2011.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ferry_building_Wellington.jpg/1280px-Ferry_building_Wellington.jpg"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-003",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/American_horse.jpg/1280px-American_horse.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Rio_from_space_at_night.jpg/1280px-Rio_from_space_at_night.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day3 8月12日",
+        "theme": "额尔古纳湿地 · 白桦林秘境",
+        "description": "上午游览亚洲第一湿地——额尔古纳湿地公园，登顶观景台俯瞰根河蜿蜒穿过广袤湿地的壮丽景色。随后驱车前往白桦林景区，漫步于金色白桦树林间，感受童话般的静谧。下午抵达俄罗斯族乡恩和，入住百年历史的木刻楞老屋，体验列巴制作。",
+        "topImages": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1280px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1280px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Sydney_Opera_House_-_Dec_2008.jpg/1280px-Sydney_Opera_House_-_Dec_2008.jpg"
+          ]
+        ],
+        "sideImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg/1280px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg",
+        "bottomImages": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/1280px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg"
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-004",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Hopetoun_falls.jpg/1280px-Hopetoun_falls.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day4 8月13日",
+        "theme": "边境小镇 · 中俄风情",
+        "description": "从恩和出发，沿额尔古纳河边境公路前行，对岸即是俄罗斯。抵达室韦——中国十大魅力名镇之一，参观中俄友谊桥、界碑。午后继续前往临江屯，这个只有几十户人家的小村庄保留着最原始的俄罗斯族生活方式。傍晚在额尔古纳河畔欣赏绝美日落。",
+        "topImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Example.jpg/1280px-Example.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/1280px-PNG_transparency_demonstration_1.png"
+          ],
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Gull_portrait_ca_usa.jpg/1280px-Gull_portrait_ca_usa.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Dhaulagiri_from_shining.jpg/1280px-Dhaulagiri_from_shining.jpg"
+          ]
+        ],
+        "sideImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1280px-Good_Food_Display_-_NCI_Visuals_Online.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1280px-Image_created_with_a_mobile_phone.png"
+        ],
+        "bottomImages": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Iguazu_Falls.jpg/1280px-Iguazu_Falls.jpg"
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-005",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Phoenix_Islands_-_panoramio.jpg/1280px-Phoenix_Islands_-_panoramio.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Clouds_over_the_Atlantic_Ocean.jpg/1280px-Clouds_over_the_Atlantic_Ocean.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day5 8月14日",
+        "theme": "策马奔腾 · 黑山头日落",
+        "description": "今日为本次旅程的骑马重头戏。上午从临江出发，穿越草原与油菜花田。下午抵达黑山头马场，在专业教练指导下体验草原骑马，从基础到策马奔腾。傍晚骑马登上山坡，观赏草原最美日落——金色余晖洒满无垠草原，这将是此行最难忘的时刻。晚间入住蒙古包营地，篝火晚会。",
+        "topImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cumulus_clouds_over_the_Atlantic.jpg/1280px-Cumulus_clouds_over_the_Atlantic.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Water_drop_impact_on_a_water-surface_-_2.jpg/1280px-Water_drop_impact_on_a_water-surface_-_2.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Copenhagen_-_the_little_mermaid_statue_-_2013.jpg/1280px-Copenhagen_-_the_little_mermaid_statue_-_2013.jpg"
+          ],
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Eiffel_tower_from_champs_de_mars.jpg/1280px-Eiffel_tower_from_champs_de_mars.jpg",
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Big_Ben_Clock_Tower_London-may_2007.jpg/1280px-Big_Ben_Clock_Tower_London-may_2007.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Beijing_national_stadium.jpg/1280px-Beijing_national_stadium.jpg"
+          ]
+        ],
+        "sideImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Partial_solar_eclipse_in_Helsinki_2008.jpg/1280px-Partial_solar_eclipse_in_Helsinki_2008.jpg"
+        ],
+        "bottomImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/20100726_Kalamitsi_Beach_Ionian_Sea_Lefkada_island_Greece.jpg/1280px-20100726_Kalamitsi_Beach_Ionian_Sea_Lefkada_island_Greece.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Ronda_la_vieja.jpg/1280px-Ronda_la_vieja.jpg"
+          ],
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kluane_National_Park_1983.jpg/1280px-Kluane_National_Park_1983.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Kiyomizu-dera%2C_Kyoto%2C_Japan_-_panoramio.jpg/1280px-Kiyomizu-dera%2C_Kyoto%2C_Japan_-_panoramio.jpg"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-006",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Balaton_Hungary_Landscape.jpg/1280px-Balaton_Hungary_Landscape.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Broadway_tower_edit.jpg/1280px-Broadway_tower_edit.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day6 8月15日",
+        "theme": "呼伦湖畔 · 满洲里异域风情",
+        "description": "离开黑山头，途经三十三湿地，前往中国第五大湖呼伦湖。在湖畔野餐，品尝全鱼宴。下午抵达满洲里，这座充满俄式建筑的边境城市宛如异国他乡。参观套娃广场——全球最大套娃主题乐园，孩子们的天堂。晚间漫步中苏街，欣赏流光溢彩的俄式建筑夜景。",
+        "topImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Glasgow_university.jpg/1280px-Glasgow_university.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Peacock_Butterfly_Inari.jpg/1280px-Peacock_Butterfly_Inari.jpg"
+          ],
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Fire_breathing_2_Luc_Viatour.jpg/1280px-Fire_breathing_2_Luc_Viatour.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Museum_of_Contemporary_Art_Belgrade.jpg/1280px-Museum_of_Contemporary_Art_Belgrade.jpg"
+          ]
+        ],
+        "sideImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Tulip_Streaked_Broken_by_Virus.jpg/1280px-Tulip_Streaked_Broken_by_Virus.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/BMW_I8_Concept_IAA_2011.jpg/1280px-BMW_I8_Concept_IAA_2011.jpg"
+        ],
+        "bottomImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ferry_building_Wellington.jpg/1280px-Ferry_building_Wellington.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/American_horse.jpg/1280px-American_horse.jpg"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "daily",
+      "id": "daily-007",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Rio_from_space_at_night.jpg/1280px-Rio_from_space_at_night.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1280px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg"
+        ],
+        "title": "详细行程",
+        "date": "Day7 8月16日",
+        "theme": "满载回忆 · 归途",
+        "description": "早餐后从满洲里出发返回海拉尔，途中经过巴尔虎草原，最后一次感受草原的辽阔。抵达海拉尔后根据航班时间送机，结束7天6晚的呼伦贝尔草原之旅。带着满满的回忆和草原的祝福，期待下次相逢。",
+        "topImages": [
+          [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1280px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Sydney_Opera_House_-_Dec_2008.jpg/1280px-Sydney_Opera_House_-_Dec_2008.jpg"
+          ]
+        ],
+        "sideImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg/1280px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/1280px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg"
+        ],
+        "bottomImages": []
+      }
+    },
+    {
+      "type": "feature",
+      "id": "feature-accommodation",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg"
+        ],
+        "title": "住宿介绍",
+        "subtype": "住宿",
+        "items": [
+          {
+            "title": "海拉尔大饭店",
+            "description": "市中心四星级酒店，交通便利，设施齐全，是抵达和离开海拉尔的最佳选择。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Hopetoun_falls.jpg/1280px-Hopetoun_falls.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Example.jpg/1280px-Example.jpg"
+              ],
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/1280px-PNG_transparency_demonstration_1.png",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Gull_portrait_ca_usa.jpg/1280px-Gull_portrait_ca_usa.jpg"
+              ]
+            ]
+          },
+          {
+            "title": "额尔古纳木屋酒店",
+            "description": "北欧风格全木质结构酒店，坐落于额尔古纳河畔，推窗即见湿地美景，是亲近自然的绝佳住所。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Dhaulagiri_from_shining.jpg/1280px-Dhaulagiri_from_shining.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1280px-Good_Food_Display_-_NCI_Visuals_Online.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1280px-Image_created_with_a_mobile_phone.png"
+              ],
+              "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Iguazu_Falls.jpg/1280px-Iguazu_Falls.jpg"
+            ]
+          },
+          {
+            "title": "恩和木刻楞民宿",
+            "description": "百年历史的俄式木刻楞建筑改造，保留原始风貌的同时配备现代设施，体验正宗俄罗斯族生活方式。",
+            "images": [
+              "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Phoenix_Islands_-_panoramio.jpg/1280px-Phoenix_Islands_-_panoramio.jpg",
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Clouds_over_the_Atlantic_Ocean.jpg/1280px-Clouds_over_the_Atlantic_Ocean.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cumulus_clouds_over_the_Atlantic.jpg/1280px-Cumulus_clouds_over_the_Atlantic.jpg"
+              ]
+            ]
+          },
+          {
+            "title": "黑山头蒙古包营地",
+            "description": "豪华蒙古包营地，独立卫浴、空调暖气一应俱全。夜晚仰望星空，体验最正宗的草原住宿。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Water_drop_impact_on_a_water-surface_-_2.jpg/1280px-Water_drop_impact_on_a_water-surface_-_2.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Copenhagen_-_the_little_mermaid_statue_-_2013.jpg/1280px-Copenhagen_-_the_little_mermaid_statue_-_2013.jpg"
+              ]
+            ]
+          },
+          {
+            "title": "满洲里套娃主题酒店",
+            "description": "全球唯一套娃主题酒店，外观为巨型套娃造型，内部装饰融合中俄蒙三国文化元素，深受亲子家庭喜爱。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Eiffel_tower_from_champs_de_mars.jpg/1280px-Eiffel_tower_from_champs_de_mars.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Big_Ben_Clock_Tower_London-may_2007.jpg/1280px-Big_Ben_Clock_Tower_London-may_2007.jpg"
+              ],
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Beijing_national_stadium.jpg/1280px-Beijing_national_stadium.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "feature",
+      "id": "feature-food",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Partial_solar_eclipse_in_Helsinki_2008.jpg/1280px-Partial_solar_eclipse_in_Helsinki_2008.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/20100726_Kalamitsi_Beach_Ionian_Sea_Lefkada_island_Greece.jpg/1280px-20100726_Kalamitsi_Beach_Ionian_Sea_Lefkada_island_Greece.jpg"
+        ],
+        "title": "餐饮特色",
+        "subtype": "餐饮",
+        "items": [
+          {
+            "title": "烤全羊",
+            "description": "选用当地散养羔羊，经传统蒙古烤制工艺，外焦里嫩，肉质鲜美，是草原宴席的最高礼遇。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Ronda_la_vieja.jpg/1280px-Ronda_la_vieja.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kluane_National_Park_1983.jpg/1280px-Kluane_National_Park_1983.jpg"
+              ]
+            ]
+          },
+          {
+            "title": "手扒肉",
+            "description": "蒙古族传统吃法，大块羊肉清水煮熟后手撕食用，蘸料简单，最大程度保留羊肉原味。",
+            "images": [
+              "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Kiyomizu-dera%2C_Kyoto%2C_Japan_-_panoramio.jpg/1280px-Kiyomizu-dera%2C_Kyoto%2C_Japan_-_panoramio.jpg",
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Balaton_Hungary_Landscape.jpg/1280px-Balaton_Hungary_Landscape.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Broadway_tower_edit.jpg/1280px-Broadway_tower_edit.jpg"
+              ]
+            ]
+          },
+          {
+            "title": "俄式大列巴",
+            "description": "恩和、室韦特色面包，使用传统酵母和砖炉烘焙，外壳酥脆内里松软，搭配蓝莓酱别有风味。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Glasgow_university.jpg/1280px-Glasgow_university.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Peacock_Butterfly_Inari.jpg/1280px-Peacock_Butterfly_Inari.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Fire_breathing_2_Luc_Viatour.jpg/1280px-Fire_breathing_2_Luc_Viatour.jpg"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "feature",
+      "id": "feature-transport",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Museum_of_Contemporary_Art_Belgrade.jpg/1280px-Museum_of_Contemporary_Art_Belgrade.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Tulip_Streaked_Broken_by_Virus.jpg/1280px-Tulip_Streaked_Broken_by_Virus.jpg"
+        ],
+        "title": "交通安排",
+        "subtype": "交通",
+        "items": [
+          {
+            "title": "全程越野车",
+            "description": "采用丰田普拉多/三菱帕杰罗越野车，每车4人，确保舒适空间。司机兼导游，经验丰富，熟悉草原路况。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/BMW_I8_Concept_IAA_2011.jpg/1280px-BMW_I8_Concept_IAA_2011.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ferry_building_Wellington.jpg/1280px-Ferry_building_Wellington.jpg"
+              ],
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/American_horse.jpg/1280px-American_horse.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Rio_from_space_at_night.jpg/1280px-Rio_from_space_at_night.jpg"
+              ]
+            ]
+          },
+          {
+            "title": "接送机服务",
+            "description": "海拉尔东山机场免费接送，满洲里西郊机场可安排单独接送（需提前预约）。",
+            "images": [
+              [
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1280px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/1280px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "text-block",
+      "id": "text-cost",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Sydney_Opera_House_-_Dec_2008.jpg/1280px-Sydney_Opera_House_-_Dec_2008.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg/1280px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg"
+        ],
+        "title": "费用说明",
+        "subtype": "费用",
+        "content": "<p>以下报价基于双人成行测算；旺季及节假日可能上浮，以合同确认为准。</p><ul class=\"textblock-lines textblock-rich-bullets\"><li>费用包含：全程越野车包车费用及油费路桥费；6晚住宿（标间/蒙古包）；行程中标注的餐食；骑马体验费用（2小时）；额尔古纳湿地门票；套娃广场门票；旅行意外险；司机兼导游服务费</li><li>费用不含：各地往返海拉尔/满洲里大交通费用；行程中未标注的餐食及个人消费；单房差（如需单住需补差价）；其他自费娱乐项目</li><li>儿童政策：1.2米以下儿童不占床减收800元/人；1.2米以上儿童与成人同价；骑马项目儿童需满6岁方可参加</li></ul>"
+      }
+    },
+    {
+      "type": "text-block",
+      "id": "text-service",
+      "data": {
+        "backgroundImage": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Sydney_Opera_House_-_Dec_2008.jpg/1280px-Sydney_Opera_House_-_Dec_2008.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg/1280px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg"
+        ],
+        "title": "服务说明",
+        "subtype": "服务",
+        "content": "<p>本路书支持在线编辑与导出；以下为服务与履约相关说明，结构上与「费用说明」一致（导语 + 列表）。</p><ul class=\"textblock-lines textblock-rich-bullets\"><li>行程与素材可按客户画像微调；定稿以双方确认版本为准。</li><li>签约前请再次核对房态、门票政策、车辆与最终人数。</li><li>可导出 HTML/PDF，适用于咨询沟通与方案比稿。</li></ul><ul class=\"textblock-lines textblock-rich-bullets\"><li>穿着建议：草原早晚温差大（8月白天25°C左右，夜间可降至10°C），请携带薄羽绒服或冲锋衣</li><li>骑马需穿长裤和平底鞋</li><li>建议携带防晒霜、太阳镜、遮阳帽</li><li>注意事项：草原蚊虫较多，请携带驱蚊液</li><li>部分地区信号较弱，请提前下载离线地图</li><li>尊重当地民族习俗，进入蒙古包请从左侧进入</li><li>草原防火意识，不要随意丢弃烟头</li><li>退改政策：出发前15天以上取消全额退款</li><li>出发前7-14天取消退款70%</li><li>出发前7天内取消不予退款</li><li>可免费更换一次出行日期（需提前10天申请）</li></ul>"
+      }
+    }
+  ]
+}

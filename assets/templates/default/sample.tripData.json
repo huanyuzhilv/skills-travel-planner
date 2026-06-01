@@ -1,0 +1,78 @@
+{
+  "title": "示例：周末城市短途游",
+  "subtitle": "两天一晚 · 轻松慢游",
+  "origin": "上海出发",
+  "dateRange": "2026年6月6日 - 6月7日",
+  "travelers": "2成人",
+  "duration": "2天1晚",
+  "generationDate": "2026-05-12",
+  "budget": {
+    "total": 2800,
+    "perPerson": 1400
+  },
+  "highlights": [
+    {
+      "category": "行程亮点",
+      "icon": "✨",
+      "items": [
+        "精选口碑住宿",
+        "核心景点深度游览",
+        "自由预留拍照与休息时间"
+      ]
+    }
+  ],
+  "days": [
+    {
+      "dayNum": 1,
+      "date": "6月6日",
+      "theme": "抵达与城市探索",
+      "activities": [
+        {
+          "name": "历史街区漫步",
+          "description": "老城石板路与特色小店，适合轻松拍照。",
+          "duration": "约3小时",
+          "imageUrl": "",
+          "tips": "穿舒适步行鞋"
+        }
+      ],
+      "meals": {
+        "breakfast": "",
+        "lunch": "当地小吃",
+        "dinner": "本帮菜"
+      },
+      "hotel": {
+        "name": "示例精选酒店",
+        "roomType": "大床房",
+        "imageUrl": "",
+        "features": ["含早", "近地铁"]
+      }
+    },
+    {
+      "dayNum": 2,
+      "date": "6月7日",
+      "theme": "返程",
+      "activities": [
+        {
+          "name": "公园晨游",
+          "description": "市区绿地轻松散步后返程。",
+          "duration": "约2小时",
+          "imageUrl": ""
+        }
+      ],
+      "meals": {
+        "breakfast": "酒店含早",
+        "lunch": "",
+        "dinner": ""
+      },
+      "hotel": null
+    }
+  ],
+  "weather": {
+    "summary": "多云间晴，气温约 22–28℃",
+    "packing": ["薄外套", "舒适步行鞋", "晴雨伞"]
+  },
+  "tips": [
+    "随身携带证件与充电宝",
+    "热门时段建议提前预约门票或餐厅"
+  ]
+}

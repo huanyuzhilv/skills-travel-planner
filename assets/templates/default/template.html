@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TRIP_TITLE}}</title>
+<style>
+  :root {
+    --ink: #2f3437;
+    --body: #5f666d;
+    --muted: #8c949b;
+    --line: #e6e8ea;
+    --dash: #e1e5e8;
+    --paper: #ffffff;
+    --page-bg: #f4f5f3;
+    --green: #2eb872;
+    --green-soft: #e6f6e6;
+    --green-pale: #f4fbf4;
+    --orange: #ff7448;
+    --gold: #d8c27a;
+    --shadow: 0 16px 48px rgba(36, 42, 46, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    color: var(--body);
+    background: var(--page-bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 28px auto;
+    padding: 44px 44px 56px;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+  }
+
+  .doc-title {
+    margin: 0;
+    color: #202427;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+
+  .title-rule {
+    height: 2px;
+    margin: 28px 0 14px;
+    background: #505458;
+  }
+
+  .overview-strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 14px;
+    padding: 16px 18px;
+    margin-bottom: 28px;
+    background: var(--green-soft);
+  }
+
+  .overview-item .label,
+  .section-kicker {
+    display: block;
+    margin-bottom: 5px;
+    color: #56605b;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .overview-item .value {
+    color: #303634;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .nav-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -4px 0 28px;
+  }
+
+  .nav-strip a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--body);
+    font-size: 12px;
+    text-decoration: none;
+    background: #fff;
+  }
+
+  .nav-strip a:hover { color: var(--green); border-color: #bde8ce; background: var(--green-pale); }
+
+  .section { margin: 30px 0 38px; }
+
+  .section-title {
+    margin: 0 0 16px;
+    color: #303436;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .section-title small {
+    margin-left: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .highlights {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .highlight-card {
+    min-height: 76px;
+    padding: 14px 14px 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .highlight-card strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+    background: var(--green);
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .feature-card { min-width: 0; }
+
+  .feature-image,
+  .hotel-image,
+  .poi-image {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+    background: linear-gradient(135deg, #dbeafe, #fef3c7);
+    cursor: zoom-in;
+  }
+
+  .feature-image { aspect-ratio: 4 / 3; }
+
+  .image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(47, 52, 55, 0.55);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .feature-name {
+    margin-top: 7px;
+    color: #32383c;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .feature-location {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .feature-location::before { content: "◇"; margin-right: 2px; }
+
+  .day-section {
+    padding: 28px 0 4px;
+    border-top: 1px solid var(--line);
+  }
+
+  .day-heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .day-code {
+    color: var(--green);
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .day-route {
+    color: var(--green);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .day-date {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .meal-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 0 0 18px;
+    color: #303436;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .weather-inline {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .timeline {
+    position: relative;
+    margin: 20px 0 0;
+    padding: 0 0 0 58px;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: 6px;
+    bottom: 10px;
+    border-left: 1px dashed #d7d9dc;
+  }
+
+  .timeline-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--gold);
+  }
+
+  .timeline-icon svg { width: 18px; height: 18px; }
+
+  .activity-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .activity-item {
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 16px;
+    padding-bottom: 13px;
+  }
+
+  .activity-time {
+    color: #697078;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .activity-title {
+    margin: 0;
+    color: #343a3d;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .activity-note,
+  .meal-detail,
+  .hotel-meta,
+  .tip-list li {
+    color: var(--body);
+    font-size: 13px;
+  }
+
+  .activity-note { margin: 4px 0 0; }
+
+  .day-brief {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .day-paragraphs {
+    margin: 14px 0 18px;
+    padding: 14px 16px;
+    background: var(--green-pale);
+    border-left: 3px solid var(--green);
+    color: var(--body);
+    font-size: 13.5px;
+    line-height: 1.8;
+  }
+
+  .day-paragraphs p {
+    margin: 0 0 8px;
+  }
+
+  .day-paragraphs p:last-child {
+    margin-bottom: 0;
+  }
+
+  .day-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 10px 0 14px;
+    padding: 6px 12px;
+    background: #fff8e8;
+    border: 1px solid #f0d080;
+    border-radius: 4px;
+    color: #7a6020;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .day-note::before {
+    content: "\26A0";
+    font-size: 13px;
+  }
+
+  .activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .activity-meta span {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f2f5f3;
+  }
+
+  .poi-section {
+    display: grid;
+    grid-template-columns: 42px 230px minmax(0, 1fr);
+    gap: 18px;
+    padding: 24px 0;
+    border-top: 1px dashed var(--dash);
+  }
+
+  .poi-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-top: 3px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--orange);
+  }
+
+  .poi-icon svg { width: 18px; height: 18px; }
+
+  .poi-image { aspect-ratio: 4 / 3; }
+
+  .poi-title {
+    margin: 2px 0 8px;
+    color: #303436;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .poi-desc {
+    margin: 0;
+    color: var(--body);
+    font-size: 13px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .summary-card,
+  .hotel-card,
+  .budget-card,
+  .tips-box {
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .summary-card { padding: 14px; }
+
+  .summary-card .name {
+    color: #303436;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .summary-card .desc {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .hotel-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .hotel-card { position: relative; overflow: hidden; }
+
+  .hotel-image { aspect-ratio: 16 / 10; cursor: zoom-in; }
+
+  .hotel-body { padding: 13px 14px 15px; }
+
+  .hotel-name {
+    color: #303436;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .hotel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 9px;
+  }
+
+  .hotel-tags span {
+    color: #5d676c;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #f2f5f3;
+  }
+
+  .budget-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .budget-card {
+    padding: 18px 20px;
+    background: var(--green-pale);
+  }
+
+  .budget-card .number {
+    color: var(--green);
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .budget-card .caption {
+    margin-top: 4px;
+    color: #56605b;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .tips-box { padding: 18px 22px; }
+
+  .tip-list {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .tip-list li { margin: 4px 0; }
+
+  .empty {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .footer-note {
+    margin-top: 42px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 28px;
+    background: rgba(23, 28, 32, 0.82);
+  }
+
+  .lightbox.show { display: flex; }
+
+  .lightbox img {
+    max-width: min(1100px, 92vw);
+    max-height: 84vh;
+    object-fit: contain;
+    background: #fff;
+  }
+
+  .lightbox button {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.16);
+  }
+
+  @media (max-width: 760px) {
+    .page { margin: 0; padding: 28px 20px 40px; box-shadow: none; }
+    .overview-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .featured-grid, .summary-grid, .hotel-grid, .budget-row { grid-template-columns: 1fr 1fr; }
+    .poi-section { grid-template-columns: 36px minmax(0, 1fr); }
+    .poi-media { grid-column: 2; }
+    .poi-content { grid-column: 2; }
+  }
+
+  @media (max-width: 520px) {
+    .doc-title { font-size: 20px; }
+    .featured-grid, .summary-grid, .hotel-grid, .budget-row, .highlights { grid-template-columns: 1fr; }
+    .activity-item { grid-template-columns: 1fr; gap: 2px; }
+    .timeline { padding-left: 46px; }
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .page {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+    .nav-strip,
+    .lightbox { display: none !important; }
+    .day-section,
+    .poi-section,
+    .hotel-card,
+    .summary-card,
+    .budget-card { break-inside: avoid; }
+    .feature-image,
+    .poi-image,
+    .hotel-image { cursor: default; }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <h1 class="doc-title" id="docTitle">{{TRIP_TITLE}}</h1>
+    <div class="title-rule" aria-hidden="true"></div>
+
+    <section class="overview-strip" aria-label="行程概览">
+      <div class="overview-item"><span class="label">出发地</span><div class="value" id="originValue">待确认</div></div>
+      <div class="overview-item"><span class="label">目的地</span><div class="value" id="destinationValue">待确认</div></div>
+      <div class="overview-item"><span class="label">出行日期</span><div class="value" id="dateRangeValue">{{DATE_RANGE}}</div></div>
+      <div class="overview-item"><span class="label">出行天数</span><div class="value" id="durationValue">-</div></div>
+      <div class="overview-item"><span class="label">人数</span><div class="value" id="travelersValue">{{TRAVELERS}}</div></div>
+      <div class="overview-item"><span class="label">预算概览</span><div class="value" id="budgetValue">¥{{TOTAL_BUDGET}} / 人均 ¥{{PER_PERSON}}</div></div>
+    </section>
+
+    <nav class="nav-strip" aria-label="页面导航">
+      <a href="#highlights">行程亮点</a>
+      <a href="#features">特色景点</a>
+      <a href="#itinerary">行程介绍</a>
+      <a href="#weather">天气住宿</a>
+      <a href="#budget">预算概览</a>
+    </nav>
+
+    <section class="section" id="highlights">
+      <h2 class="section-title">行程亮点 <small>顾问甄选 · 慢节奏安排</small></h2>
+      <ul class="highlights" id="highlightList"></ul>
+    </section>
+
+    <section class="section" id="features">
+      <h2 class="section-title">特色景点 <small>不可错过的特色景点</small></h2>
+      <div class="featured-grid" id="featureGrid"></div>
+    </section>
+
+    <section class="section" id="itinerary">
+      <h2 class="section-title">行程介绍</h2>
+      <div id="daysContainer"></div>
+    </section>
+
+    <section class="section" id="poiIntro">
+      <h2 class="section-title">景点介绍</h2>
+      <div id="poiList"></div>
+    </section>
+
+    <section class="section" id="weather">
+      <h2 class="section-title">天气与住宿</h2>
+      <div class="summary-grid" id="weatherGrid"></div>
+      <div style="height:18px"></div>
+      <div class="hotel-grid" id="hotelGrid"></div>
+    </section>
+
+    <section class="section" id="budget">
+      <h2 class="section-title">预算概览 <small>仅显示总预算/人均</small></h2>
+      <div class="budget-row">
+        <div class="budget-card"><div class="number" id="totalBudget">-</div><div class="caption">总预算参考</div></div>
+        <div class="budget-card"><div class="number" id="perPersonBudget">-</div><div class="caption">人均预算参考</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="tipsSection">
+      <h2 class="section-title">友情提示</h2>
+      <div class="tips-box"><ul class="tip-list" id="tipsList"></ul></div>
+    </section>
+
+    <div class="footer-note">生成日期：{{GENERATION_DATE}}</div>
+  </main>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
+    <button type="button" id="lightboxClose" aria-label="关闭">×</button>
+    <img id="lightboxImage" alt="">
+  </div>
+
+  <script id="trip-data" type="application/json">{{TRIP_DATA_JSON}}</script>
+  <script>
+    const SVG = {
+      calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
+      landmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V9h14v12M4 9l8-5 8 5M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01M16 17h.01"/></svg>'
+    };
+
+    const tripData = JSON.parse(document.getElementById('trip-data').textContent || '{}');
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
+    }
+
+    function formatMoney(value) {
+      const number = Number(value || 0);
+      if (!Number.isFinite(number) || number <= 0) return '待确认';
+      return `¥${number.toLocaleString('zh-CN')}`;
+    }
+
+    function text(value, fallback = '待确认') {
+      const normalized = String(value ?? '').trim();
+      return normalized || fallback;
+    }
+
+    function getDays() {
+      return Array.isArray(tripData.days) ? tripData.days : [];
+    }
+
+    function getActivities() {
+      return getDays().flatMap((day, dayIndex) => (Array.isArray(day.activities) ? day.activities : []).map((activity, activityIndex) => ({ ...activity, day, dayIndex, activityIndex })));
+    }
+
+    function isMealActivity(activity) {
+      return Boolean(activity.meal) || /早餐|午餐|晚餐|用餐/.test(String(activity.name || ''));
+    }
+
+    function getImageUrls(activity) {
+      if (Array.isArray(activity.imageUrls)) return activity.imageUrls.filter(Boolean);
+      return activity.imageUrl ? [activity.imageUrl] : [];
+    }
+
+    function guessDestination() {
+      if (tripData.destination) return tripData.destination;
+      const title = String(tripData.title || '');
+      const match = title.match(/^(.+?)(?:\d|[0-9]|亲子|旅行|游|计划)/);
+      if (match && match[1]) return match[1].replace(/[\s-]+$/g, '');
+      const firstTheme = getDays().map(day => String(day.theme || '').split(/[+＋>＞]/)[0].trim()).find(Boolean);
+      return firstTheme || '待确认';
+    }
+
+    function mealSummary(day) {
+      const meals = { breakfast: '敬请自理', lunch: '敬请自理', dinner: '敬请自理' };
+      for (const activity of day.activities || []) {
+        const name = String(activity.name || '');
+        const mealName = activity.meal?.name || name;
+        if (/早/.test(name)) meals.breakfast = mealName;
+        if (/午/.test(name)) meals.lunch = mealName;
+        if (/晚/.test(name)) meals.dinner = mealName;
+      }
+      return meals;
+    }
+
+    function imageMarkup(url, alt, className, index) {
+      if (url) {
+        return `<img class="${className} js-lightbox" src="${escapeHtml(url)}" alt="${escapeHtml(alt)}" loading="lazy" referrerpolicy="no-referrer">`;
+      }
+      const seed = escapeHtml(String(alt || '景').slice(0, 2));
+      const hue = (Number(index || 0) * 47) % 360;
+      return `<div class="${className} image-placeholder" style="background:linear-gradient(135deg,hsl(${hue} 62% 88%),hsl(${(hue + 46) % 360} 76% 92%))">${seed}</div>`;
+    }
+
+    function renderOverview() {
+      const days = getDays();
+      const budget = tripData.budget || {};
+      document.getElementById('docTitle').textContent = text(tripData.title, '{{TRIP_TITLE}}');
+      document.getElementById('originValue').textContent = text(tripData.origin || tripData.departure || tripData.departureCity);
+      document.getElementById('destinationValue').textContent = text(guessDestination());
+      document.getElementById('dateRangeValue').textContent = text(tripData.dateRange, '{{DATE_RANGE}}');
+      document.getElementById('durationValue').textContent = days.length ? `${days.length}天` : text(tripData.duration);
+      document.getElementById('travelersValue').textContent = text(tripData.travelers, '{{TRAVELERS}}');
+      document.getElementById('budgetValue').textContent = `${formatMoney(budget.total)} / 人均 ${formatMoney(budget.perPerson)}`;
+      document.getElementById('totalBudget').textContent = formatMoney(budget.total);
+      document.getElementById('perPersonBudget').textContent = formatMoney(budget.perPerson);
+    }
+
+    function renderHighlights() {
+      const list = document.getElementById('highlightList');
+      // Support both tripData.highlights (string array) and tripData.highlightSections
+      let source = [];
+      if (Array.isArray(tripData.highlights) && tripData.highlights.length) {
+        source = tripData.highlights;
+      } else if (Array.isArray(tripData.highlightSections)) {
+        for (const section of tripData.highlightSections) {
+          if (!Array.isArray(section.items)) continue;
+          for (const item of section.items) {
+            if (typeof item === 'string') source.push(item);
+            else if (item && item.label) source.push(`${item.label}${item.text ? '：' + item.text : ''}`);
+            else if (item && item.text) source.push(item.text);
+          }
+        }
+      }
+      if (!source.length) {
+        source = getDays().map((day, index) => `${day.theme || `第${index + 1}天`}：节奏适中，兼顾核心景点与休息时间`).slice(0, 3);
+      }
+      list.innerHTML = source.length
+        ? source.slice(0, 6).map((item, index) => `<li class="highlight-card"><strong>${index + 1}</strong>${escapeHtml(item)}</li>`).join('')
+        : '<li class="empty">暂无行程亮点。</li>';
+    }
+
+    function featuredActivities() {
+      const candidates = getActivities().filter(activity => !isMealActivity(activity));
+      const withImages = candidates.filter(activity => getImageUrls(activity).length);
+      const list = (withImages.length ? withImages : candidates).slice(0, 8);
+      return list;
+    }
+
+    function renderFeatures() {
+      const grid = document.getElementById('featureGrid');
+      const items = featuredActivities();
+      grid.innerHTML = items.length
+        ? items.map((activity, index) => {
+          const image = getImageUrls(activity)[0];
+          return `<article class="feature-card">
+            ${imageMarkup(image, activity.name, 'feature-image', index)}
+            <div class="feature-name">${escapeHtml(activity.name)}</div>
+            <div class="feature-location">${escapeHtml(activity.day?.theme || guessDestination())}</div>
+          </article>`;
+        }).join('')
+        : '<p class="empty">暂无特色景点。</p>';
+    }
+
+    function renderDays() {
+      const container = document.getElementById('daysContainer');
+      const days = getDays();
+      container.innerHTML = days.map((day, index) => {
+        const meals = mealSummary(day);
+        const weather = day.weather ? `${day.weather.high ?? '-'}°/${day.weather.low ?? '-'}°` : '';
+        const activities = (day.activities || []).map(activity => {
+          const meal = activity.meal;
+          const title = meal ? `${activity.name}：${meal.name}` : activity.name;
+          const noteParts = [];
+          if (meal) noteParts.push([meal.cuisine, meal.location, meal.recommended ? `推荐：${meal.recommended}` : ''].filter(Boolean).join(' · '));
+          if (activity.note) noteParts.push(activity.note);
+          return `<li class="activity-item">
+            <div class="activity-time">${escapeHtml(activity.time || '')}</div>
+            <div>
+              <h3 class="activity-title">${escapeHtml(title || '行程安排')}</h3>
+              ${noteParts.filter(Boolean).map(part => `<p class="activity-note">${escapeHtml(part)}</p>`).join('')}
+              <div class="activity-meta">
+                ${activity.duration ? `<span>${escapeHtml(activity.duration)}</span>` : ''}
+                ${activity.transport ? `<span>${escapeHtml(activity.transport)}</span>` : ''}
+              </div>
+            </div>
+          </li>`;
+        }).join('');
+
+        return `<article class="day-section">
+          <header class="day-heading">
+            <span class="day-code">D${index + 1}</span>
+            <span class="day-route">${escapeHtml(day.theme || `第${index + 1}天`)}</span>
+            <span class="day-date">${escapeHtml([day.date, day.weekday].filter(Boolean).join(' '))}</span>
+            ${weather ? `<span class="weather-inline">天气 ${escapeHtml(weather)}</span>` : ''}
+          </header>
+          ${day.brief ? `<p class="day-brief">${escapeHtml(day.brief)}</p>` : ''}
+          ${day.note ? `<div class="day-note">${escapeHtml(day.note)}</div>` : ''}
+          <div class="meal-summary">
+            <span>早餐-${escapeHtml(meals.breakfast)}</span>
+            <span>午餐-${escapeHtml(meals.lunch)}</span>
+            <span>晚餐-${escapeHtml(meals.dinner)}</span>
+          </div>
+          <div class="timeline">
+            <div class="timeline-icon">${SVG.calendar}</div>
+            <ul class="activity-list">${activities}</ul>
+          </div>
+          ${Array.isArray(day.paragraphs) && day.paragraphs.length ? `<div class="day-paragraphs">${day.paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('')}</div>` : ''}
+        </article>`;
+      }).join('');
+    }
+
+    function renderPois() {
+      const list = document.getElementById('poiList');
+      const pois = getActivities().filter(activity => !isMealActivity(activity) && (activity.note || getImageUrls(activity).length)).slice(0, 12);
+      list.innerHTML = pois.length
+        ? pois.map((activity, index) => `<article class="poi-section">
+          <div class="poi-icon">${SVG.landmark}</div>
+          <div class="poi-media">${imageMarkup(getImageUrls(activity)[0], activity.name, 'poi-image', index)}</div>
+          <div class="poi-content">
+            <h3 class="poi-title">${escapeHtml(activity.name)}</h3>
+            <p class="poi-desc">${escapeHtml(activity.note || `${activity.day?.theme || '本日行程'}中的重点游览安排。`)}</p>
+          </div>
+        </article>`).join('')
+        : '<p class="empty">暂无景点介绍。</p>';
+    }
+
+    function renderWeatherAndHotels() {
+      const weatherGrid = document.getElementById('weatherGrid');
+      const weather = tripData.weather || {};
+      const cards = [
+        ['天气概况', weather.summary || '以出行前实时预报为准'],
+        ['穿衣建议', weather.clothing || '建议准备舒适鞋履和轻便外套'],
+        ['出行提示', [weather.rainfall ? `降水概率 ${weather.rainfall}` : '', weather.tips || '保持弹性节奏'].filter(Boolean).join(' · ')]
+      ];
+      weatherGrid.innerHTML = cards.map(([name, desc]) => `<div class="summary-card"><div class="name">${escapeHtml(name)}</div><div class="desc">${escapeHtml(desc)}</div></div>`).join('');
+
+      const hotelGrid = document.getElementById('hotelGrid');
+      const hotels = Array.isArray(tripData.hotels) ? tripData.hotels : [];
+      hotelGrid.innerHTML = hotels.length
+        ? hotels.slice(0, 6).map((hotel, index) => {
+          // Support both hotel.highlights (tag list) and hotel.rank/intro fields
+          const tagSrc = hotel.highlights || hotel.rank || '';
+          const tags = String(tagSrc).split(/[;\uff1b\u3001,\uff0c]/).map(item => item.trim()).filter(Boolean);
+          const metaParts = [hotel.area, hotel.rating ? `评分 ${hotel.rating}` : '', hotel.openYear ? `开业 ${hotel.openYear}` : ''].filter(Boolean);
+          return `<article class="hotel-card">
+            ${imageMarkup(hotel.imageUrl, hotel.name, 'hotel-image', index)}
+            <div class="hotel-body">
+              ${hotel.dayBadge ? `<div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">${escapeHtml(hotel.dayBadge)}</div>` : ''}
+              <div class="hotel-name">${escapeHtml(hotel.name)}</div>
+              <div class="hotel-meta">${escapeHtml(metaParts.join(' \u00b7 '))}</div>
+              ${hotel.intro ? `<div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(hotel.intro)}</div>` : ''}
+              <div class="hotel-tags">${tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
+            </div>
+          </article>`;
+        }).join('')
+        : '<p class="empty">暂无酒店信息。</p>';
+    }
+
+    function renderTips() {
+      const section = document.getElementById('tipsSection');
+      const list = document.getElementById('tipsList');
+      // Support both tripData.tips and tripData.notices
+      const tips = Array.isArray(tripData.tips) && tripData.tips.length
+        ? tripData.tips
+        : Array.isArray(tripData.notices) ? tripData.notices : [];
+      if (!tips.length) {
+        section.style.display = 'none';
+        return;
+      }
+      list.innerHTML = tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('');
+    }
+
+    function bindLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      const image = document.getElementById('lightboxImage');
+      const close = document.getElementById('lightboxClose');
+      document.addEventListener('click', event => {
+        const target = event.target;
+        if (!(target instanceof HTMLImageElement) || !target.classList.contains('js-lightbox')) return;
+        image.src = target.src;
+        image.alt = target.alt || '';
+        lightbox.classList.add('show');
+      });
+      function hide() {
+        lightbox.classList.remove('show');
+        image.src = '';
+      }
+      close.addEventListener('click', hide);
+      lightbox.addEventListener('click', event => { if (event.target === lightbox) hide(); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') hide(); });
+    }
+
+    renderOverview();
+    renderHighlights();
+    renderFeatures();
+    renderDays();
+    renderPois();
+    renderWeatherAndHotels();
+    renderTips();
+    bindLightbox();
+  </script>
+</body>
+</html>

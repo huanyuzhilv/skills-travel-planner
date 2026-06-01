@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TRIP_TITLE}}</title>
+<style>
+  :root {
+    --ink: #1f2328;
+    --body: #3c434a;
+    --muted: #8b9199;
+    --line: #e3e6ea;
+    --line-soft: #eef1f4;
+    --paper: #ffffff;
+    --page-bg: #ededed;
+    --brand: #1f6feb;       /* 宣传册蓝 */
+    --brand-deep: #134ab0;
+    --accent: #d93838;      /* 自理/强调红 */
+    --hi: #fff388;          /* 关键信息高亮黄 */
+    --tag: #f5f7fb;
+    --shadow: 0 10px 30px rgba(18, 22, 26, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--page-bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 每一个 .sheet 相当于一页 A4 横版 */
+  .sheet {
+    width: 1120px;
+    min-height: 780px;
+    margin: 24px auto;
+    padding: 48px 56px;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  @media print {
+    .sheet + .sheet { break-before: page; page-break-before: always; }
+  }
+
+  /* ========== 封面 ========== */
+  .cover {
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    overflow: hidden;
+  }
+  .cover-image {
+    min-height: 780px;
+    background: linear-gradient(135deg, #87c9a8, #4a9d7a 60%, #2f7a5c);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .cover-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 780px;
+    object-fit: cover;
+    display: block;
+  }
+  .cover-meta {
+    padding: 72px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .cover-subtitle {
+    margin: 0 0 14px;
+    color: var(--ink);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .cover-subtitle::before { content: "{"; color: var(--brand); margin-right: 4px; }
+  .cover-subtitle::after  { content: "}"; color: var(--brand); margin-left: 4px; }
+  .cover-title {
+    margin: 0 0 34px;
+    color: var(--ink);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+  .cover-info {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .cover-info span { margin: 0 10px; }
+  .cover-info span + span { border-left: 1px solid var(--line); padding-left: 20px; }
+
+  /* ========== 章节大编号（01/02/03） ========== */
+  .chapter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 780px;
+    padding: 0;
+  }
+  .chapter-inner {
+    text-align: left;
+    padding-left: 80px;
+  }
+  .chapter-no {
+    color: var(--brand);
+    font-size: 120px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .chapter-name {
+    margin-top: 16px;
+    color: var(--ink);
+    font-size: 38px;
+    font-weight: 700;
+  }
+  .chapter-sub {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* ========== 通用章节标题 ========== */
+  .h-section {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+    margin: 0 0 28px;
+  }
+  .h-section .no {
+    color: var(--brand);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .h-section .name {
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .h-section .sub {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: auto;
+  }
+
+  /* ========== 行程亮点 ========== */
+  .hl-group { margin-bottom: 22px; }
+  .hl-title {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 0 10px;
+  }
+  .hl-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 28px;
+  }
+  .hl-list li {
+    position: relative;
+    padding: 3px 0 3px 18px;
+    color: var(--body);
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .hl-list li::before {
+    content: "•";
+    color: var(--brand);
+    font-weight: 800;
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    font-size: 14px;
+  }
+  .hl-list li b {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ========== 概览表格 ========== */
+  .ov-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .ov-table thead th {
+    background: #f3f4f6;
+    color: var(--ink);
+    font-weight: 800;
+    padding: 12px 10px;
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+  .ov-table tbody td {
+    padding: 14px 12px;
+    border: 1px solid var(--line);
+    color: var(--body);
+    vertical-align: middle;
+    line-height: 1.7;
+  }
+  .ov-table td.col-day {
+    width: 110px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .ov-table td.col-day .day-code { display: block; font-size: 15px; }
+  .ov-table td.col-day .day-date { display: block; color: var(--muted); font-size: 12px; font-weight: 500; margin-top: 2px; }
+  .ov-table td.col-route { text-align: center; color: var(--ink); }
+  .ov-table td.col-route .flight { display: block; color: var(--brand); font-weight: 700; margin-top: 4px; font-size: 12.5px; }
+  .ov-table td.col-transport, .ov-table td.col-stay {
+    width: 100px;
+    text-align: center;
+    font-weight: 700;
+  }
+  .ov-table td .tag-self { color: var(--accent); font-weight: 800; }
+  .ov-table td .tag-car  { color: var(--brand); font-weight: 800; }
+  .table-note {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .table-note b { color: var(--accent); }
+
+  /* ========== 每日行程 ========== */
+  .day-block {
+    padding: 18px 0 24px;
+    border-top: 1px solid var(--line);
+  }
+  .day-block:first-of-type { border-top: 0; padding-top: 4px; }
+  .day-head {
+    margin: 0 0 10px;
+    color: var(--brand);
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .day-head .day-code {
+    background: var(--brand);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 10px;
+    vertical-align: 2px;
+  }
+  .day-brief {
+    margin: 0 0 10px;
+    color: var(--body);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .day-brief b { color: var(--ink); }
+  .day-narrative {
+    margin: 0 0 8px;
+    color: var(--body);
+    font-size: 13.5px;
+    line-height: 1.9;
+  }
+  .day-note {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fff9e0;
+    color: #7a5a00;
+    font-size: 12.5px;
+    border-left: 3px solid #f0c93a;
+  }
+
+  /* ========== 酒店卡片 ========== */
+  .hotel-block {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 36px;
+    align-items: start;
+    padding-top: 8px;
+  }
+  .hotel-title {
+    grid-column: 1 / -1;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    margin: 0 0 24px;
+    color: var(--ink);
+    font-size: 28px;
+    font-weight: 800;
+  }
+  .hotel-title .badge {
+    color: var(--brand);
+    margin-right: 8px;
+    font-weight: 800;
+  }
+  .hotel-title .rank {
+    float: right;
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .hotel-intro {
+    font-size: 13.5px;
+    color: var(--body);
+    line-height: 1.95;
+  }
+  .hotel-intro .lead {
+    color: var(--brand);
+    font-weight: 800;
+    margin-right: 2px;
+  }
+  .hotel-specs { margin-top: 18px; }
+  .hotel-specs div {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 4px 6px 4px 0;
+    background: var(--hi);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .hotel-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: linear-gradient(135deg, #e2ecf5, #f5e8d6);
+    cursor: zoom-in;
+  }
+  .hotel-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(47, 52, 55, 0.55);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  /* ========== 餐饮推荐 ========== */
+  .dining-group { margin-bottom: 24px; }
+  .dining-title {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid var(--brand);
+  }
+  .dining-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .dining-card {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    background: #fbfcfd;
+  }
+  .dining-card .name {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .dining-card .desc {
+    color: var(--muted);
+    font-size: 12.5px;
+    margin-top: 4px;
+  }
+
+  /* ========== 费用说明 / 注意事项 ========== */
+  .cost-block { margin-bottom: 26px; }
+  .cost-title {
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--brand);
+    display: inline-block;
+    padding-right: 14px;
+  }
+  .cost-title.exclude { border-color: var(--accent); }
+  .cost-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .cost-list li {
+    padding: 7px 0 7px 26px;
+    position: relative;
+    color: var(--body);
+    font-size: 13.5px;
+    line-height: 1.8;
+    border-bottom: 1px dashed var(--line-soft);
+  }
+  .cost-list li::before {
+    counter-increment: costi;
+    content: counter(costi);
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cost-list { counter-reset: costi; }
+  .cost-list.exclude li::before { background: var(--accent); }
+  .cost-list li b { color: var(--ink); }
+
+  .notice-tips {
+    padding: 18px 22px;
+    background: #fff9e0;
+    border: 1px solid #f4dfa1;
+  }
+  .notice-tips .hd {
+    color: #7a5a00;
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .notice-tips ol {
+    padding-left: 20px;
+    margin: 0;
+    color: #6a4f00;
+    font-size: 13px;
+  }
+  .notice-tips ol li { margin: 4px 0; line-height: 1.8; }
+
+  /* ========== 结尾页 ========== */
+  .ending {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 780px;
+    background: var(--ink);
+    color: #fff;
+  }
+  .ending .text {
+    font-size: 88px;
+    font-weight: 800;
+    letter-spacing: 0.3em;
+  }
+  .ending .text::before, .ending .text::after {
+    content: "·";
+    color: var(--brand);
+    margin: 0 20px;
+  }
+
+  /* ========== Lightbox ========== */
+  .lightbox {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000; padding: 28px; background: rgba(23, 28, 32, 0.82);
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: min(1200px, 92vw); max-height: 86vh; object-fit: contain; background: #fff; }
+  .lightbox button {
+    position: absolute; top: 18px; right: 22px; width: 40px; height: 40px;
+    border: 0; border-radius: 50%; color: #fff; font-size: 24px; cursor: pointer;
+    background: rgba(255,255,255,0.16);
+  }
+
+  /* ========== 响应式 ========== */
+  @media (max-width: 1180px) {
+    .sheet { width: auto; margin: 16px; padding: 32px 28px; }
+    .cover { grid-template-columns: 1fr; }
+    .cover-image { min-height: 360px; }
+    .cover-image img { min-height: 360px; }
+    .cover-meta { padding: 32px 24px; align-items: flex-start; text-align: left; }
+    .hotel-block { grid-template-columns: 1fr; gap: 18px; }
+    .hl-list { grid-template-columns: 1fr; }
+    .dining-grid { grid-template-columns: 1fr 1fr; }
+    .ov-table { font-size: 12px; }
+  }
+
+  @media (max-width: 640px) {
+    .chapter-no { font-size: 80px; }
+    .chapter-name { font-size: 26px; }
+    .cover-subtitle { font-size: 22px; }
+    .cover-title { font-size: 20px; }
+    .dining-grid { grid-template-columns: 1fr; }
+    .ending .text { font-size: 48px; letter-spacing: 0.2em; }
+  }
+
+  /* ========== 打印 ========== */
+  @page { size: A4 landscape; margin: 10mm; }
+  @media print {
+    body { background: #fff; }
+    /* 只对需要独占一页的 sheet 强制分页，避免连续强制分页造成空白页 */
+    .sheet.cover, .sheet.chapter, .sheet.ending {
+      break-before: page; page-break-before: always;
+      break-after: page; page-break-after: always;
+    }
+    #hotelSheets > .sheet { break-before: page; page-break-before: always; }
+    #highlights, #overviewTable, #detail, #dining, #cost { break-before: page; page-break-before: always; }
+    #cover { break-before: auto; page-break-before: auto; }
+    .sheet {
+      width: 100%;
+      min-height: auto;
+      margin: 0;
+      padding: 10mm 12mm;
+      box-shadow: none;
+    }
+    /* 全屏类页面（封面/章节/结尾）：固定高度适配 A4 横向可用区 */
+    .sheet.cover, .sheet.chapter, .sheet.ending {
+      padding: 0;
+      height: 190mm;
+      min-height: 190mm;
+      overflow: hidden;
+    }
+    .cover { display: grid; grid-template-columns: 1.25fr 1fr; }
+    .cover-image, .cover-image img { height: 190mm; min-height: 190mm; }
+    .cover-meta { padding: 24mm 18mm; }
+    .chapter { display: flex; align-items: center; justify-content: center; }
+    .ending   { display: flex; align-items: center; justify-content: center; }
+    /* 酒店页：缩小图片与间距，确保单页内放下不溢出 */
+    .hotel-block { grid-template-columns: 1fr 1fr; gap: 10mm; }
+    .hotel-image { aspect-ratio: auto; height: 95mm; width: 100%; object-fit: cover; }
+    .hotel-intro { font-size: 11pt; line-height: 1.7; }
+    .hotel-title { font-size: 22pt; margin-bottom: 6mm; padding-bottom: 3mm; }
+    .hotel-block, .day-block, .hl-group, .dining-group, .cost-block { break-inside: avoid; page-break-inside: avoid; }
+    .hotel-title { break-after: avoid; page-break-after: avoid; }
+    .day-head { break-after: avoid; page-break-after: avoid; }
+    .lightbox { display: none !important; }
+    .hotel-image { cursor: default; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- 封面 -->
+  <section class="sheet cover" id="cover">
+    <div class="cover-image" id="coverImage"></div>
+    <div class="cover-meta">
+      <h2 class="cover-subtitle" id="coverSubtitle">{{COVER_SUBTITLE}}</h2>
+      <h1 class="cover-title" id="coverTitle">{{TRIP_TITLE}}</h1>
+      <div class="cover-info" id="coverInfo">
+        <span id="coverOrigin">{{ORIGIN}}</span>
+        <span id="coverDate">{{DATE_RANGE}}</span>
+        <span id="coverDuration">{{DURATION}}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 行程亮点 -->
+  <section class="sheet" id="highlights">
+    <div class="h-section">
+      <span class="no">01</span>
+      <span class="name">行程亮点</span>
+      <span class="sub">精品小团 · 深度纯玩 · 亲子节奏</span>
+    </div>
+    <div id="highlightGroups"></div>
+  </section>
+
+  <!-- 章节封面：行程概览 -->
+  <section class="sheet chapter">
+    <div class="chapter-inner">
+      <div class="chapter-no">02</div>
+      <div class="chapter-name">行程概览</div>
+      <div class="chapter-sub">Itinerary Overview</div>
+    </div>
+  </section>
+
+  <!-- 行程概览表 -->
+  <section class="sheet" id="overviewTable">
+    <div class="h-section">
+      <span class="no">02</span>
+      <span class="name">行程概览表</span>
+      <span class="sub">每日路线 · 交通 · 住宿地</span>
+    </div>
+    <table class="ov-table">
+      <thead>
+        <tr>
+          <th style="width:110px">日期</th>
+          <th>行程概览</th>
+          <th style="width:100px">交通</th>
+          <th style="width:100px">住宿地</th>
+        </tr>
+      </thead>
+      <tbody id="overviewTableBody"></tbody>
+    </table>
+    <div class="table-note" id="overviewNote"></div>
+  </section>
+
+  <!-- 章节封面：详细行程 -->
+  <section class="sheet chapter">
+    <div class="chapter-inner">
+      <div class="chapter-no">03</div>
+      <div class="chapter-name">详细行程</div>
+      <div class="chapter-sub">Day-by-Day Plan</div>
+    </div>
+  </section>
+
+  <!-- 详细行程 -->
+  <section class="sheet" id="detail">
+    <div class="h-section">
+      <span class="no">03</span>
+      <span class="name">详细行程</span>
+      <span class="sub">按日展开 · 体验式描述</span>
+    </div>
+    <div id="dayDetails"></div>
+  </section>
+
+  <!-- 章节封面：酒店推荐 -->
+  <section class="sheet chapter">
+    <div class="chapter-inner">
+      <div class="chapter-no">04</div>
+      <div class="chapter-name">酒店推荐</div>
+      <div class="chapter-sub">Selected Accommodations</div>
+    </div>
+  </section>
+
+  <!-- 酒店推荐（每家一页） -->
+  <div id="hotelSheets"></div>
+
+  <!-- 章节封面：餐饮推荐 -->
+  <section class="sheet chapter" id="diningChapter" style="display:none">
+    <div class="chapter-inner">
+      <div class="chapter-no">05</div>
+      <div class="chapter-name">餐饮推荐</div>
+      <div class="chapter-sub">Local Flavors &amp; Souvenirs</div>
+    </div>
+  </section>
+
+  <!-- 餐饮推荐 -->
+  <section class="sheet" id="dining" style="display:none">
+    <div class="h-section">
+      <span class="no">05</span>
+      <span class="name">餐饮推荐</span>
+      <span class="sub">特色美食与伴手礼</span>
+    </div>
+    <div id="diningGroups"></div>
+  </section>
+
+  <!-- 费用说明 / 注意事项 -->
+  <section class="sheet" id="cost">
+    <div class="h-section">
+      <span class="no">06</span>
+      <span class="name">费用说明与注意事项</span>
+      <span class="sub">出行前请认真阅读</span>
+    </div>
+
+    <div class="cost-block" id="costIncludesBlock">
+      <div class="cost-title">费用包含</div>
+      <ol class="cost-list include" id="costIncludesList"></ol>
+    </div>
+
+    <div class="cost-block" id="costExcludesBlock">
+      <div class="cost-title exclude">费用不含</div>
+      <ol class="cost-list exclude" id="costExcludesList"></ol>
+    </div>
+
+    <div class="notice-tips" id="noticeTipsBlock">
+      <div class="hd">温馨提示 / 注意事项</div>
+      <ol id="noticeTipsList"></ol>
+    </div>
+  </section>
+
+  <!-- 结尾 -->
+  <section class="sheet ending">
+    <div class="text">THANKS</div>
+  </section>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
+    <button type="button" id="lightboxClose" aria-label="关闭">×</button>
+    <img id="lightboxImage" alt="">
+  </div>
+
+  <script id="trip-data" type="application/json">{{TRIP_DATA_JSON}}</script>
+  <script>
+    const tripData = JSON.parse(document.getElementById('trip-data').textContent || '{}');
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    }
+    function text(value, fallback = '') {
+      const v = String(value ?? '').trim();
+      return v || fallback;
+    }
+    function hasText(value) { return String(value ?? '').trim().length > 0; }
+
+    /* ========== 封面 ========== */
+    function renderCover() {
+      document.getElementById('coverTitle').textContent = text(tripData.title, '{{TRIP_TITLE}}');
+      document.getElementById('coverSubtitle').textContent = text(tripData.subtitle, '');
+      if (!hasText(tripData.subtitle)) document.getElementById('coverSubtitle').style.display = 'none';
+      document.getElementById('coverOrigin').textContent = text(tripData.origin || tripData.departure, '出发地待定');
+      document.getElementById('coverDate').textContent = text(tripData.dateRange, '日期待定');
+      const days = Array.isArray(tripData.days) ? tripData.days.length : 0;
+      document.getElementById('coverDuration').textContent = text(tripData.duration, days ? `${days}天${Math.max(days - 1, 0)}晚` : '');
+
+      const cover = document.getElementById('coverImage');
+      const coverUrl = tripData.coverImage || tripData.cover || '';
+      if (coverUrl) {
+        cover.innerHTML = `<img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(tripData.title || '')}" loading="lazy" referrerpolicy="no-referrer">`;
+      }
+    }
+
+    /* ========== 亮点 ========== */
+    function renderHighlights() {
+      const wrap = document.getElementById('highlightGroups');
+      const groups = Array.isArray(tripData.highlightSections) && tripData.highlightSections.length
+        ? tripData.highlightSections
+        : [{ title: '核心亮点', items: Array.isArray(tripData.highlights) ? tripData.highlights : [] }];
+      wrap.innerHTML = groups.map(group => {
+        const items = (group.items || []).map(item => {
+          if (typeof item === 'string') return `<li>${escapeHtml(item)}</li>`;
+          const label = item.label ? `<b>${escapeHtml(item.label)}：</b>` : '';
+          return `<li>${label}${escapeHtml(item.text || '')}</li>`;
+        }).join('');
+        return `<div class="hl-group">
+          <h3 class="hl-title">${escapeHtml(group.title || '')}</h3>
+          <ul class="hl-list">${items}</ul>
+        </div>`;
+      }).join('');
+    }
+
+    /* ========== 概览表 ========== */
+    function transportTag(t) {
+      const v = text(t, '自理');
+      if (/自理/.test(v)) return `<span class="tag-self">${escapeHtml(v)}</span>`;
+      if (/飞机|航班|高铁|动车|火车|大巴|用车|越野|霸道|自驾/.test(v)) return `<span class="tag-car">${escapeHtml(v)}</span>`;
+      return escapeHtml(v);
+    }
+
+    function renderOverviewTable() {
+      const tbody = document.getElementById('overviewTableBody');
+      const rows = Array.isArray(tripData.overviewTable) && tripData.overviewTable.length
+        ? tripData.overviewTable
+        : (Array.isArray(tripData.days) ? tripData.days.map((d, i) => ({
+            code: `D${i + 1}`,
+            date: d.date || '',
+            weekday: d.weekday || '',
+            route: d.theme || '',
+            transport: d.transport || '',
+            stay: d.stay || ''
+          })) : []);
+      tbody.innerHTML = rows.map(row => {
+        const flight = row.flight ? `<div class="flight">${escapeHtml(row.flight)}</div>` : '';
+        return `<tr>
+          <td class="col-day">
+            <span class="day-code">${escapeHtml(row.code || '')}</span>
+            <span class="day-date">${escapeHtml(row.date || '')}${row.weekday ? '（' + escapeHtml(row.weekday) + '）' : ''}</span>
+          </td>
+          <td class="col-route">${escapeHtml(row.route || '')}${flight}</td>
+          <td class="col-transport">${transportTag(row.transport)}</td>
+          <td class="col-stay">${escapeHtml(row.stay || '—')}</td>
+        </tr>`;
+      }).join('');
+      const note = document.getElementById('overviewNote');
+      if (hasText(tripData.overviewNote)) {
+        note.innerHTML = `<b>注意事项：</b>${escapeHtml(tripData.overviewNote)}`;
+      } else {
+        note.style.display = 'none';
+      }
+    }
+
+    /* ========== 详细行程 ========== */
+    function renderDayDetails() {
+      const wrap = document.getElementById('dayDetails');
+      const days = Array.isArray(tripData.days) ? tripData.days : [];
+      wrap.innerHTML = days.map((day, i) => {
+        const code = `D${i + 1}`;
+        const head = `${escapeHtml(day.heading || day.theme || `第${i + 1}天`)}`;
+        const brief = day.brief ? `<p class="day-brief"><b>速览：</b>${escapeHtml(day.brief)}</p>` : '';
+        const paragraphs = Array.isArray(day.paragraphs) && day.paragraphs.length
+          ? day.paragraphs
+          : (day.narrative ? [day.narrative] : []);
+        const body = paragraphs.map(p => `<p class="day-narrative">${escapeHtml(p)}</p>`).join('');
+        const note = day.note ? `<div class="day-note">备注：${escapeHtml(day.note)}</div>` : '';
+        return `<article class="day-block">
+          <h3 class="day-head"><span class="day-code">${code}</span>${head}</h3>
+          ${brief}
+          ${body}
+          ${note}
+        </article>`;
+      }).join('');
+    }
+
+    /* ========== 酒店（每家一页） ========== */
+    function renderHotels() {
+      const wrap = document.getElementById('hotelSheets');
+      const hotels = Array.isArray(tripData.hotels) ? tripData.hotels : [];
+      wrap.innerHTML = hotels.map((hotel, i) => {
+        const badge = hotel.dayBadge || `D${i + 1}`;
+        const rank = hotel.rank || hotel.rating || '';
+        const specs = [
+          hotel.openYear ? `开业：${hotel.openYear}` : '',
+          hotel.roomCount ? `客房数：${hotel.roomCount}` : '',
+          hotel.roomArea ? `房间面积：${hotel.roomArea}` : ''
+        ].filter(Boolean).map(s => `<div>${escapeHtml(s)}</div>`).join('');
+        const img = hotel.imageUrl
+          ? `<img class="hotel-image js-lightbox" src="${escapeHtml(hotel.imageUrl)}" alt="${escapeHtml(hotel.name || '')}" loading="lazy" referrerpolicy="no-referrer">`
+          : `<div class="hotel-image hotel-image-placeholder">${escapeHtml((hotel.name || '酒店').slice(0, 2))}</div>`;
+        return `<section class="sheet">
+          <h2 class="hotel-title">
+            <span class="badge">${escapeHtml(badge)}</span>《${escapeHtml(hotel.name || '')}》
+            ${rank ? `<span class="rank">${escapeHtml(rank)}</span>` : ''}
+          </h2>
+          <div class="hotel-block">
+            <div class="hotel-intro">
+              <span class="lead">简介：</span>${escapeHtml(hotel.intro || hotel.description || '暂无简介。')}
+              <div class="hotel-specs">${specs}</div>
+            </div>
+            <div>${img}</div>
+          </div>
+        </section>`;
+      }).join('');
+    }
+
+    /* ========== 餐饮推荐 ========== */
+    function renderDining() {
+      const groups = Array.isArray(tripData.dining) ? tripData.dining : [];
+      if (!groups.length) return;
+      document.getElementById('diningChapter').style.display = '';
+      document.getElementById('dining').style.display = '';
+      const wrap = document.getElementById('diningGroups');
+      wrap.innerHTML = groups.map(group => {
+        const cards = (group.items || []).map(item => {
+          if (typeof item === 'string') return `<div class="dining-card"><div class="name">${escapeHtml(item)}</div></div>`;
+          return `<div class="dining-card">
+            <div class="name">${escapeHtml(item.name || '')}</div>
+            ${item.desc ? `<div class="desc">${escapeHtml(item.desc)}</div>` : ''}
+          </div>`;
+        }).join('');
+        return `<div class="dining-group">
+          <h3 class="dining-title">${escapeHtml(group.title || '')}</h3>
+          <div class="dining-grid">${cards}</div>
+        </div>`;
+      }).join('');
+    }
+
+    /* ========== 费用说明 / 注意事项 ========== */
+    function renderCostList(listId, blockId, items) {
+      const list = document.getElementById(listId);
+      const block = document.getElementById(blockId);
+      if (!items || !items.length) {
+        block.style.display = 'none';
+        return;
+      }
+      list.innerHTML = items.map(item => {
+        if (typeof item === 'string') return `<li>${escapeHtml(item)}</li>`;
+        const label = item.label ? `<b>${escapeHtml(item.label)}：</b>` : '';
+        return `<li>${label}${escapeHtml(item.text || '')}</li>`;
+      }).join('');
+    }
+
+    function renderCost() {
+      renderCostList('costIncludesList', 'costIncludesBlock', tripData.costIncludes || []);
+      renderCostList('costExcludesList', 'costExcludesBlock', tripData.costExcludes || []);
+      const notices = Array.isArray(tripData.notices) ? tripData.notices : (Array.isArray(tripData.tips) ? tripData.tips : []);
+      const noticeBlock = document.getElementById('noticeTipsBlock');
+      const noticeList = document.getElementById('noticeTipsList');
+      if (!notices.length) {
+        noticeBlock.style.display = 'none';
+      } else {
+        noticeList.innerHTML = notices.map(n => `<li>${escapeHtml(n)}</li>`).join('');
+      }
+    }
+
+    /* ========== Lightbox ========== */
+    function bindLightbox() {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightboxImage');
+      const close = document.getElementById('lightboxClose');
+      document.addEventListener('click', evt => {
+        const t = evt.target;
+        if (!(t instanceof HTMLImageElement) || !t.classList.contains('js-lightbox')) return;
+        img.src = t.src; img.alt = t.alt || '';
+        lb.classList.add('show');
+      });
+      function hide() { lb.classList.remove('show'); img.src = ''; }
+      close.addEventListener('click', hide);
+      lb.addEventListener('click', e => { if (e.target === lb) hide(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+    }
+
+    renderCover();
+    renderHighlights();
+    renderOverviewTable();
+    renderDayDetails();
+    renderHotels();
+    renderDining();
+    renderCost();
+    bindLightbox();
+  </script>
+</body>
+</html>

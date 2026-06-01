@@ -1,0 +1,4 @@
+# 可选：路书配图「感知哈希去重 + 缓存」增强（fill_xhs_images --visual-dedupe）
+# pip install -r requirements-roadbook-images.txt
+Pillow>=10.0.0
+ImageHash>=4.3.0

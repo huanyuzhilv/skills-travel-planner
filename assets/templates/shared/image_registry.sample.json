@@ -1,0 +1,18 @@
+{
+  "hotel": {
+    "hotel_bei_jing_nan_001": [
+      "https://example.com/hotel-001-cover.jpg",
+      "https://example.com/hotel-001-room.jpg"
+    ]
+  },
+  "poi": {
+    "poi_gugong_001": [
+      "https://example.com/poi-gugong-main.jpg",
+      "https://example.com/poi-gugong-side.jpg"
+    ],
+    "poi_mutianyu_001": [
+      "https://example.com/poi-mutianyu-main.jpg",
+      "https://example.com/poi-mutianyu-cablecar.jpg"
+    ]
+  }
+}

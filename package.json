@@ -1,0 +1,9 @@
+{
+  "name": "skills-travel-planner",
+  "private": false,
+  "description": "Travel planner skill：路书 tripData、generate.py、roadbook-v2 交付脚本",
+  "scripts": {
+    "roadbook:deliver": "python3 scripts/deliver_roadbook_v2.py",
+    "roadbook:deliver:help": "python3 scripts/deliver_roadbook_v2.py --help"
+  }
+}

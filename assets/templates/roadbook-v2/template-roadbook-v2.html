@@ -1,0 +1,5731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>路书</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root {
+  --color-primary: #2c6e6a;
+  --color-primary-light: #4a9e97;
+  --color-accent: #c8a962;
+  --color-dark: #1a2332;
+  --color-text: #2d3748;
+  --color-text-light: #5a6a7e;
+  --color-text-muted: #8896a7;
+  --color-bg: #f7f8fa;
+  --color-card: #ffffff;
+  --color-border: #e8ecf0;
+  --color-cream: #fbf6ec;
+  --color-ink: #14202b;
+  --color-gold-soft: rgba(200,169,98,0.16);
+  --gradient-premium: linear-gradient(135deg, #123b3a 0%, #2c6e6a 48%, #c8a962 140%);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 30px rgba(0,0,0,0.10);
+  --shadow-lg: 0 16px 50px rgba(0,0,0,0.14);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --font-display: system-ui, -apple-system, "SF Pro Display", "PingFang SC", sans-serif;
+  --font-body: system-ui, -apple-system, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+}
+
+/* 印刷纸张：与 Chrome --print-to-pdf / 系统打印对话框一致（边距可随版式再调） */
+@page {
+  size: A4 portrait;
+  /* 略收紧默认边距，多给正文；打印机「边距」仍可在对话框里覆盖 */
+  margin: 8mm;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at 8% 4%, rgba(200,169,98,0.16), transparent 28%),
+    radial-gradient(circle at 92% 0%, rgba(44,110,106,0.12), transparent 30%),
+    var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+.roadbook-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--color-bg);
+  box-shadow: 0 0 0 1px rgba(20,32,43,0.04), 0 24px 80px rgba(20,32,43,0.10);
+}
+
+/* ========== 全屏页面组件 ========== */
+.page-section {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.page-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.page-bg-placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #2c6e6a 0%, #1a2332 100%);
+  z-index: 0;
+}
+
+.page-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(26,35,50,0.3) 0%, rgba(26,35,50,0.7) 100%);
+  z-index: 1;
+  /* 仅作视觉压暗，不参与点击命中；否则整层盖在 page-bg-wrap 之上，背景槽内「备选 / 编辑蒙层」无法点击（详细行程等章节大标题页常见） */
+  pointer-events: none;
+}
+
+.page-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1100px;
+  padding: 56px 40px;
+  pointer-events: auto;
+}
+
+/* ========== 封面 ========== */
+.cover-section {
+  min-height: 100vh;
+  display: flex;
+  background: var(--color-card);
+}
+
+.cover-left {
+  flex: 0 0 60%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  box-shadow: 18px 0 60px rgba(20,32,43,0.16);
+}
+
+.cover-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-left::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(20,32,43,0.18), transparent 48%),
+    linear-gradient(0deg, rgba(20,32,43,0.22), transparent 42%);
+}
+
+.cover-left .cover-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3a8f87, #1a4a5e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: rgba(255,255,255,0.2);
+  font-weight: 900;
+}
+
+.cover-right {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 50px;
+  background:
+    linear-gradient(180deg, rgba(251,246,236,0.78), rgba(255,255,255,0.96)),
+    var(--color-card);
+  position: relative;
+}
+
+.cover-right::before {
+  content: '';
+  position: absolute;
+  top: 42px;
+  right: 42px;
+  width: 86px;
+  height: 86px;
+  border-top: 1px solid rgba(200,169,98,0.55);
+  border-right: 1px solid rgba(200,169,98,0.55);
+}
+
+.cover-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--color-accent);
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.cover-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 40px;
+  opacity: 0.85;
+}
+
+.cover-logo-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 40px;
+}
+
+.cover-logo-wrap .cover-logo {
+  margin-bottom: 0;
+  display: block;
+}
+
+.cover-left > .img-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+}
+
+/* 封面主图仅用 <img>，不再叠一层 background-image，避免加载时闪烁 */
+.cover-left > .img-wrapper.cover-bg {
+  background-image: none !important;
+  background-color: #1a3d45;
+}
+
+.cover-left > .img-wrapper.cover-bg > img {
+  transition: none;
+  transform: none;
+}
+
+.page-bg-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* 避免通用 .img-wrapper 的浅灰渐变底叠在通栏背景上（否则看起来像「灰色盖住照片」）
+   使用 background shorthand + !important 确保覆盖后面第 ~1740 行 .img-wrapper 的灰色渐变；
+   inline style / JS 的 setProperty(..., 'important') 优先级更高，不会被此规则阻挡。 */
+.page-bg-wrap.img-wrapper {
+  position: absolute !important;
+  inset: 0 !important;
+  background: transparent !important;
+}
+
+.page-bg-wrap .page-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.textblock-section.page-section-with-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 与带 .page-content 的章节一致：卡片须在 page-overlay（z-index:1）之上，否则无法点击与编辑正文 */
+.textblock-section.page-section-with-bg .textblock-card {
+  position: relative;
+  z-index: 2;
+}
+
+/* 费用/服务说明：无章节大背景图与替换控件，仅用淡色底衬白板 */
+.textblock-section.textblock-simple-rich {
+  background: linear-gradient(180deg, #eef2f6 0%,rgb(244 246 249) 100%);
+}
+
+/* 出行须知：无章节背景图，整页白底（与费用/服务的灰底区分） */
+.textblock-section.textblock-notice.textblock-plain-notice {
+  background: #ffffff;
+}
+
+.textblock-section.textblock-simple-rich .textblock-card {
+  box-shadow: 0 8px 24px rgba(20, 32, 43, 0.08);
+}
+
+.cover-title {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--color-dark);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.cover-meta-card {
+  margin-top: 38px;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(44,110,106,0.12);
+  background: rgba(255,255,255,0.68);
+  color: var(--color-text-light);
+  font-size: 0.88rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.cover-subtitle {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  line-height: 1.6;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
+}
+
+/* ========== 行程亮点 ========== */
+.highlights-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 40px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.highlights-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255,255,255,0.72);
+}
+
+.highlights-content {
+  font-size: 1.05rem;
+  color: var(--color-text);
+  line-height: 2;
+  margin-bottom: 24px;
+}
+
+.highlights-items {
+  list-style: none;
+  padding: 0;
+}
+
+.highlights-items li {
+  padding: 14px 0 14px 42px;
+  position: relative;
+  font-size: 1rem;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  line-height: 1.7;
+}
+
+.highlights-items li:last-child { border-bottom: none; }
+
+.highlights-items li::before {
+  content: counter(highlight-counter, decimal-leading-zero);
+  counter-increment: highlight-counter;
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gradient-premium);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.highlights-items { counter-reset: highlight-counter; }
+
+.highlights-item-text {
+  display: inline-block;
+  width: calc(100% - 44px);
+  vertical-align: top;
+}
+
+.hl-item-del {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(200,30,30,0.45);
+  background: rgba(255,255,255,0.9);
+  color: #bf2020;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body.editing .hl-item-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.highlights-item-add {
+  display: none;
+  margin-top: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px dashed rgba(44,110,106,0.45);
+  background: rgba(44,110,106,0.06);
+  color: #1f5a56;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+body.editing .highlights-item-add {
+  display: inline-block;
+}
+
+/* ========== 行程表 ========== */
+.itinerary-title-page .page-content {
+  text-align: center;
+}
+
+/* 行程概览 / 详细行程等「章节大标题页」：轻遮罩，背景图更易辨识 */
+.itinerary-title-page .page-overlay,
+.chapter-title-page .page-overlay {
+  background: linear-gradient(180deg, rgba(18,30,52,0.16) 0%, rgba(18,30,52,0.34) 100%);
+}
+
+.itinerary-title-page .page-bg-wrap .page-bg,
+.chapter-title-page .page-bg-wrap .page-bg {
+  filter: saturate(1.08) contrast(1.04) brightness(1.02);
+}
+
+.section-big-title {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  letter-spacing: 0.05em;
+}
+
+.section-big-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: var(--color-accent);
+  margin: 20px auto 0;
+  border-radius: 2px;
+}
+
+.component-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.92);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.component-kicker span {
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.textblock-card .component-kicker {
+  margin-left: 0;
+  background: rgba(44,110,106,0.08);
+  border-color: rgba(44,110,106,0.12);
+  color: var(--color-primary);
+}
+
+/* 行程表格 */
+.itinerary-table-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding: 64px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.itinerary-table {
+  width: 100%;
+  min-width: 860px;
+  max-width: 1100px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: var(--color-card);
+  border: 1px solid rgba(44,110,106,0.10);
+}
+
+.itinerary-table thead th {
+  background: var(--gradient-premium);
+  color: #fff;
+  padding: 14px 14px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: left;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.itinerary-table tbody tr { transition: background 0.2s; }
+.itinerary-table tbody tr:nth-child(even) { background: #f8fafa; }
+.itinerary-table tbody tr:hover { background: #eef5f4; }
+
+.itinerary-table tbody td {
+  padding: 12px 14px;
+  font-size: 0.84rem;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.itinerary-table tbody td:first-child {
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+}
+
+.itinerary-table tbody td.itinerary-time {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  min-width: 5.5em;
+}
+
+/* 时间线样式 */
+.timeline-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.tl-item {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: 59px;
+  top: 40px;
+  bottom: -32px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-primary-light), var(--color-border));
+}
+
+.tl-item:last-child::before { display: none; }
+
+.tl-date {
+  flex: 0 0 80px;
+  text-align: center;
+  padding-top: 8px;
+}
+
+.tl-date .tl-day {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
+.tl-date .tl-datestr {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.tl-dot {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+  margin-top: 10px;
+}
+
+.tl-content {
+  flex: 1;
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tl-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+.tl-content p {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+/* ========== 每日行程 ========== */
+/* 有侧图时右栏图库高度上限由 --daily-right-gallery-max 控制；左栏可独立变长 */
+.daily-content-page {
+  min-height: 0;
+  background: var(--color-card);
+  padding: 0;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  align-items: stretch;
+  border-top: 1px solid rgba(44,110,106,0.08);
+}
+
+.daily-content-page.no-right-column {
+  grid-template-columns: 1fr;
+}
+
+/* 每日行程固定模板（可通过 data.layoutTemplate 指定） */
+.daily-content-page.daily-layout-classic { grid-template-columns: 3fr 2fr; }
+.daily-content-page.daily-layout-focus { grid-template-columns: minmax(0, 3.3fr) minmax(0, 1.7fr); }
+.daily-content-page.daily-layout-gallery { grid-template-columns: minmax(0, 2.8fr) minmax(0, 2.2fr); }
+.daily-content-page.daily-layout-minimal { grid-template-columns: 1fr; }
+
+.daily-left-column {
+  padding: 36px 8px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background:
+    linear-gradient(135deg, rgba(251,246,236,0.82), rgba(255,255,255,0.96) 38%),
+    var(--color-card);
+}
+
+/* 包住顶部图片区与「添加上方图片」，便于悬浮按钮定位 */
+.daily-top-zone {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.daily-top-images {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 0;
+  height: 220px;
+}
+
+.daily-top-images.cols-1 { grid-template-columns: 1fr; }
+.daily-top-images.cols-2 { grid-template-columns: 1fr 1fr; }
+.daily-top-images.cols-2-hero { grid-template-columns: 2fr 1fr; }
+.daily-top-images.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.daily-top-images .img-wrapper {
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+.daily-top-images .img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.daily-title-bar {
+  background: var(--gradient-premium);
+  padding: 16px 24px;
+  margin: 0 0 18px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(44,110,106,0.18);
+  flex: 0 0 auto;
+}
+
+.daily-title-bar::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -20px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+}
+
+.daily-label {
+  flex: 0 0 100%;
+  color: rgba(255,255,255,0.72);
+  font-size: 0.68rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+.daily-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.daily-day-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.36);
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.daily-title-bar .daily-date {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+}
+
+.daily-title-bar .daily-theme {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.daily-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.daily-meta-item {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.daily-overview-wrap {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(44,110,106,0.08);
+  border: 1px solid rgba(44,110,106,0.16);
+}
+
+.daily-overview-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+}
+
+.daily-overview-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.daily-text {
+  font-size: 0.96rem;
+  color: var(--color-text);
+  line-height: 1.9;
+  flex: 0 1 auto;
+  min-height: 0;
+  white-space: pre-line;
+}
+
+.daily-right-column {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 36px 24px 36px 4px;
+  min-height: 100%;
+  align-content: start;
+  min-width: 0;
+  width: 100%;
+  justify-self: stretch;
+}
+
+/* 有侧图时：右栏图库固定高度上限（与住宿卡思路一致，可调 --daily-right-gallery-max） */
+.daily-content-page:not(.no-right-column) > .daily-right-column.daily-right-gallery {
+  --daily-right-gallery-max: min(80vh, 760px);
+  height: var(--daily-right-gallery-max);
+  max-height: var(--daily-right-gallery-max);
+  align-self: start;
+  overflow: hidden;
+}
+
+.daily-right-column.daily-right-gallery {
+  align-self: stretch;
+  min-width: 0;
+  align-content: stretch;
+}
+
+/* 右侧图库：最多 8 张；长文时各行 1fr 均分增高（顺序与 sideImage + bottomImages 一致） */
+.daily-right-column.daily-right-gallery .img-wrapper {
+  height: 100%;
+  width: 100%;
+  min-height: 64px;
+}
+
+.daily-right-gallery--1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--1 .img-wrapper {
+  max-height: none;
+  min-height: 0;
+  height: 100%;
+}
+
+/* 2：上下均分增高 */
+.daily-right-gallery--2 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+  gap: 6px;
+}
+
+.daily-right-gallery--2 .img-wrapper {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* 3：上二（定高/比例）+ 下一行 1fr 随列增高 */
+.daily-right-gallery--3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--3 .img-wrapper:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.daily-right-gallery--3 .img-wrapper:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.daily-right-gallery--3 .img-wrapper:nth-child(3) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.daily-right-gallery--3 .img-wrapper:nth-child(1),
+.daily-right-gallery--3 .img-wrapper:nth-child(2) {
+  aspect-ratio: 4 / 3;
+  min-height: 100px;
+  max-height: min(36vh, 256px);
+  height: auto;
+}
+
+/* 4：2×2 */
+.daily-right-gallery--4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--4 .img-wrapper {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* 5：2×2 + 底栏 */
+.daily-right-gallery--5 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--5 .img-wrapper:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.daily-right-gallery--5 .img-wrapper:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.daily-right-gallery--5 .img-wrapper:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.daily-right-gallery--5 .img-wrapper:nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.daily-right-gallery--5 .img-wrapper:nth-child(5) {
+  grid-column: 1/-1;
+  grid-row: 3;
+  min-height: 0;
+  aspect-ratio: unset;
+}
+
+/* 6：三行两列 */
+.daily-right-gallery--6 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--6 .img-wrapper {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* 7：末行通栏 */
+.daily-right-gallery--7 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--7 .img-wrapper:nth-child(7) {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  aspect-ratio: unset;
+}
+
+.daily-right-gallery--7 .img-wrapper {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* 8：四行两列 */
+.daily-right-gallery--8 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.daily-right-gallery--8 .img-wrapper {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.daily-right-column .img-wrapper {
+  overflow: hidden;
+  border-radius: var(--radius);
+  position: relative;
+  background: #eef3f6;
+  width: 100%;
+  min-height: 0;
+}
+
+.daily-right-column .img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.daily-img-actions {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 22;
+  gap: 6px;
+  align-items: center;
+}
+
+.daily-img-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.daily-drag-handle {
+  cursor: grab;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  padding: 0 1px;
+}
+.daily-drag-handle:active {
+  cursor: grabbing;
+}
+
+body.editing .daily-top-images .img-wrapper img,
+body.editing .daily-right-column .img-wrapper img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+body.editing .img-wrapper.daily-dnd-source {
+  opacity: 0.65;
+  outline: 2px dashed rgba(44,110,106,0.75);
+  outline-offset: 2px;
+}
+body.editing .img-wrapper.daily-dnd-over {
+  outline: 2px solid rgba(44,110,106,0.95);
+  outline-offset: 2px;
+}
+
+.daily-zone-add {
+  display: none;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px dashed rgba(44,110,106,0.45);
+  background: rgba(44,110,106,0.08);
+  color: #1d5a56;
+  font-size: 0.84rem;
+  cursor: pointer;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 顶部「添加上方图片」：右下角悬浮，避免与删除按钮（右上）重叠 */
+body.editing .daily-top-zone:has(.daily-top-images) .daily-zone-add[data-zone="top"] {
+  position: absolute;
+  top: auto;
+  bottom: 10px;
+  right: 10px;
+  z-index: 26;
+  margin-top: 0;
+  border-style: solid;
+  border-color: rgba(44,110,106,0.35);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 6px 20px rgba(44,110,106,0.22);
+  backdrop-filter: blur(8px);
+}
+
+/* 尚无顶部图片时，保留一块占位避免按钮压到标题栏 */
+body.editing .daily-top-zone:not(:has(.daily-top-images)) {
+  min-height: 40px;
+}
+
+body.editing .daily-img-actions,
+body.editing .daily-zone-add {
+  display: inline-flex;
+}
+
+/* 右侧「添加图片」：右下角悬浮，不占网格行 */
+body.editing .daily-right-column .daily-zone-add[data-zone="right"] {
+  position: absolute;
+  bottom: 10px;
+  right: 8px;
+  z-index: 24;
+  margin-top: 0;
+  border-style: solid;
+  border-color: rgba(44,110,106,0.35);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 6px 20px rgba(44,110,106,0.22);
+  backdrop-filter: blur(8px);
+}
+
+/* 住宿卡右侧图库：编辑态「添加图片」悬浮（与每日右栏一致） */
+body.editing .feature-hotel-sheet-visual .daily-zone-add[data-zone="stay-gallery"] {
+  position: absolute;
+  bottom: 10px;
+  right: 8px;
+  z-index: 24;
+  margin-top: 0;
+  border-style: solid;
+  border-color: rgba(44,110,106,0.35);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 6px 20px rgba(44,110,106,0.22);
+  backdrop-filter: blur(8px);
+}
+
+/* 编辑态：住宿/交通右栏与 daily 右栏底部留出条带，「+ 添加右侧图片」落在留白内，不压住末格「备选」（.img-alt-btn z-index 25） */
+body.editing .feature-hotel-sheet-visual {
+  box-sizing: border-box;
+  padding-bottom: 48px;
+}
+
+body.editing .daily-content-page:not(.no-right-column) > .daily-right-column.daily-right-gallery {
+  box-sizing: border-box;
+  padding-bottom: 48px;
+}
+
+/* 单列布局（无右栏）时居中收窄，提升可读性 */
+.daily-content-page.daily-layout-minimal .daily-left-column,
+.daily-content-page.no-right-column .daily-left-column {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 40px;
+}
+
+.daily-content-page.no-right-column .daily-left-column {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ========== 特点介绍 ========== */
+.feature-header {
+  min-height: 42vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding: 36px 28px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.feature-section {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.feature-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-card-title-wrap {
+  background: var(--gradient-premium);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feature-card-title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.feature-type-pill {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.32);
+  color: rgba(255,255,255,0.88);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.feature-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 14px;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+.feature-card-body.balance-short {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 0.55fr);
+}
+
+.feature-card-body.balance-long {
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.72fr);
+}
+
+.feature-card-body.no-images .feature-card-text {
+  max-width: 100%;
+}
+
+.feature-card-text {
+  min-width: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  line-height: 1.8;
+}
+
+.feature-card-images {
+  width: 100%;
+  max-width: 340px;
+  justify-self: end;
+  align-self: start;
+  display: grid;
+  gap: 8px;
+}
+
+.feature-card-images.media-compact {
+  max-width: 260px;
+}
+
+.feature-card-images.media-relaxed {
+  max-width: 360px;
+}
+
+.feature-card-images.img-count-1 { grid-template-columns: 1fr; }
+.feature-card-images.img-count-2 { grid-template-columns: 1fr 1fr; }
+.feature-card-images.img-count-3 { grid-template-columns: 1fr 1fr; }
+
+.feature-card-images .img-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 4/3;
+  max-height: 180px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+}
+
+.feature-card-images.media-compact .img-wrapper {
+  aspect-ratio: 3/2;
+  max-height: 148px;
+}
+
+.feature-card-images.media-relaxed .img-wrapper {
+  max-height: 196px;
+}
+
+.feature-card-images .img-wrapper:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.feature-card-images .img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== 特点介绍 · 住宿 / 交通（左文右图酒店卡，最多 8 张，排版同每日右栏） ========== */
+.feature-section.feature-hotel-sheet-section .feature-cards {
+  grid-template-columns: 1fr;
+  max-width: min(100%, 1240px);
+  gap: 32px;
+  padding: 36px 24px 52px;
+}
+
+.feature-hotel-sheet {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(26, 35, 50, 0.08);
+  box-shadow: 0 8px 32px rgba(20, 32, 43, 0.08);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.feature-hotel-sheet:hover {
+  box-shadow: 0 12px 40px rgba(20, 32, 43, 0.12);
+}
+
+.feature-hotel-sheet-head {
+  padding: 22px 26px 16px;
+}
+
+.feature-hotel-sheet-kicker {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: rgba(44, 110, 106, 0.75);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.feature-hotel-sheet-title {
+  font-family: var(--font-display, Georgia, 'Songti SC', serif);
+  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: #1a2332;
+  margin: 0;
+}
+
+.feature-hotel-sheet-rule {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(26, 35, 50, 0.12), rgba(26, 35, 50, 0.04));
+  margin: 0 26px;
+}
+
+.feature-hotel-sheet-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 1.08fr);
+  gap: 28px 36px;
+  padding: 22px 26px 26px;
+  align-items: stretch;
+}
+
+.feature-hotel-sheet-copy {
+  min-width: 0;
+}
+
+.feature-hotel-intro-row {
+  margin-bottom: 6px;
+}
+
+.feature-hotel-intro-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3d7ea6;
+  letter-spacing: 0.02em;
+}
+
+.feature-hotel-intro-label::after {
+  content: '：';
+}
+
+.feature-hotel-sheet-desc {
+  font-size: 1.02rem;
+  line-height: 1.88;
+  color: #2c3544;
+  white-space: pre-line;
+  margin: 0;
+}
+
+/* 住宿右侧图区高度上限（与 JS/编辑态无关）；改一处 --feature-hotel-visual-max 即可调全局 */
+.feature-hotel-sheet-visual {
+  --feature-hotel-visual-max: min(60vh, 600px);
+  min-width: 0;
+  width: 100%;
+  height: var(--feature-hotel-visual-max);
+  max-height: var(--feature-hotel-visual-max);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-self: start;
+  overflow: hidden;
+}
+
+/* 交通节右侧（车辆/配图）整块略矮，避免竖向占比过大；住宿仍为上方默认值 */
+.feature-section.feature-transport .feature-hotel-sheet-visual {
+  --feature-hotel-visual-max: min(48vh, 460px);
+}
+
+/* 住宿图库：在 .feature-hotel-sheet-visual 固定高度内 1fr 分栏排布 */
+.feature-hotel-gallery {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  align-content: stretch;
+}
+
+.feature-hotel-gallery .feature-hotel-gcell {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  background: #eef3f6;
+  height: 100%;
+  width: 100%;
+  min-height: 64px;
+}
+
+.feature-hotel-gallery .feature-hotel-gcell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feature-hotel-gallery--1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--1 .feature-hotel-gcell {
+  max-height: none;
+  min-height: 0;
+  height: 100%;
+}
+
+.feature-hotel-gallery--2 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+  gap: 6px;
+}
+
+.feature-hotel-gallery--2 .feature-hotel-gcell {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.feature-hotel-gallery--3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(3) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(1),
+.feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(2) {
+  aspect-ratio: 4 / 3;
+  min-height: 100px;
+  max-height: min(36vh, 256px);
+  height: auto;
+}
+
+.feature-hotel-gallery--4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--4 .feature-hotel-gcell {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.feature-hotel-gallery--5 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--5 .feature-hotel-gcell:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.feature-hotel-gallery--5 .feature-hotel-gcell:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.feature-hotel-gallery--5 .feature-hotel-gcell:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.feature-hotel-gallery--5 .feature-hotel-gcell:nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.feature-hotel-gallery--5 .feature-hotel-gcell:nth-child(5) {
+  grid-column: 1/-1;
+  grid-row: 3;
+  min-height: 0;
+  aspect-ratio: unset;
+}
+
+.feature-hotel-gallery--6 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--6 .feature-hotel-gcell {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* 7～8 张：与每日行程右侧 .daily-right-gallery--7 / --8 一致 */
+.feature-hotel-gallery--7 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--7 .feature-hotel-gcell:nth-child(7) {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  aspect-ratio: unset;
+}
+
+.feature-hotel-gallery--7 .feature-hotel-gcell {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.feature-hotel-gallery--8 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  height: 100%;
+}
+
+.feature-hotel-gallery--8 .feature-hotel-gcell {
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* ========== 文字说明 ========== */
+.textblock-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  padding: 20px 18px;
+}
+
+.textblock-card {
+  width: min(100%, 1260px);
+  min-height: min(90vh, 980px);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.94);
+  box-shadow: 0 10px 28px rgba(20,32,43,0.10);
+  padding: 34px 52px 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.textblock-bg-hint {
+  font-size: 12px;
+  color: rgba(20,32,43,0.42);
+  line-height: 1;
+  min-height: 14px;
+}
+
+.textblock-title {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: #b18144;
+  letter-spacing: 0.01em;
+  text-align: left;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.textblock-body-panel {
+  flex: 1 1 auto;
+  min-height: 360px;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.textblock-body-content {
+  font-size: 1.08rem;
+  color: #111;
+  line-height: 1.92;
+  white-space: pre-line;
+}
+
+.textblock-empty {
+  margin-top: 28px;
+  color: rgba(17,17,17,0.46);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.textblock-content {
+  font-size: 1.08rem;
+  color: #111;
+  line-height: 1.92;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* 费用/服务正文内列表：分项用 <ul class="textblock-lines textblock-rich-bullets">（Intake 输出；旧数据可能为 textblock-cost-lines） */
+.textblock-lines {
+  margin: 0 0 1.35em;
+  padding-left: 1.35em;
+  list-style-position: outside;
+  font-size: 1.06rem;
+  color: #111;
+  line-height: 1.85;
+}
+
+.textblock-lines li {
+  margin: 0.5em 0;
+  padding-left: 0.15em;
+}
+
+.textblock-lines li::marker {
+  color: rgba(17, 17, 17, 0.35);
+}
+
+.textblock-rich {
+  white-space: normal;
+  font-size: 1.06rem;
+  color: #1a2330;
+  line-height: 1.9;
+}
+
+.textblock-rich p {
+  margin: 0.65em 0;
+}
+
+.textblock-rich p:first-child {
+  margin-top: 0;
+}
+
+.textblock-rich p:last-child {
+  margin-bottom: 0;
+}
+
+.textblock-rich ul,
+.textblock-rich ol {
+  margin: 0.5em 0 0.65em;
+  padding-left: 1.35em;
+}
+
+.textblock-rich strong {
+  font-weight: 700;
+  color: #0b0b0b;
+}
+
+/* tripData 文案 `**加粗**` 渲染为 strong（非富文本 HTML 字段） */
+.highlights-item-text strong,
+.highlights-content strong,
+.cover-title strong,
+.cover-subtitle strong,
+.cover-meta-card strong,
+.section-big-title strong,
+.highlights-title strong,
+.textblock-title strong,
+.daily-theme strong,
+.daily-overview-text strong,
+.daily-text strong,
+.daily-meta-item strong,
+.itinerary-table td strong,
+.tl-content h4 strong,
+.tl-content p strong,
+.feature-hotel-sheet-title strong,
+.feature-hotel-sheet-desc strong,
+.feature-card-title strong,
+.feature-card-text strong,
+.textblock-section-item h3 strong,
+.textblock-section-item .tb-body strong,
+.textblock-content:not(.textblock-rich-editor) strong {
+  font-weight: 700;
+}
+
+.textblock-rich-editor {
+  min-height: 12em;
+  margin-top: 12px;
+}
+
+.textblock-section-item {
+  margin-top: 14px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.textblock-section-item h3 {
+  display: inline-block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 8px;
+  padding: 2px 8px;
+  background: #f0ef3e;
+  border-radius: 2px;
+}
+
+.textblock-section-item .tb-body {
+  font-size: 1.06rem;
+  color: #111;
+  line-height: 1.9;
+  white-space: pre-line;
+}
+
+.textblock-section-item .tb-body.tb-cost {
+  color: #0b0b0b;
+}
+
+.textblock-section-item .tb-body .tb-note {
+  color: #d80000;
+  font-weight: 700;
+}
+
+.textblock-section-item .tb-body .tb-tip {
+  color: #0087d8;
+  font-weight: 700;
+}
+
+/* ========== 图片占位 ========== */
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  background: linear-gradient(135deg, #e8ecf0, #d1d8e0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.img-wrapper {
+  position: relative;
+  display: block;
+  background: linear-gradient(135deg, #eef3f6, #dde7ea);
+  isolation: isolate;
+}
+
+.img-wrapper > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s ease, filter 0.45s ease;
+}
+
+.cover-logo-wrap > .cover-logo {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 封面 Logo 槽位同属 .img-wrapper，勿使用通用图的浅蓝灰垫底（会与 PNG 留白/圆角叠出「淡蓝底」） */
+.cover-logo-wrap.img-wrapper {
+  background: transparent;
+}
+
+body:not(.editing) .roadbook-component:not(.dragging) .img-wrapper:hover > img {
+  transform: scale(1.025);
+}
+
+.img-placeholder {
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(44,110,106,0.10), rgba(200,169,98,0.16)),
+    #eef3f6;
+}
+
+.img-placeholder span {
+  display: block;
+}
+
+.img-placeholder small {
+  display: block;
+  max-width: 90%;
+  color: rgba(90,106,126,0.74);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  word-break: break-all;
+}
+
+/* 顶层组件块：多页 itinerary / daily 包裹，便于整段拖拽与删除 */
+.roadbook-component {
+  position: relative;
+}
+
+.img-edit-overlay .slot-path {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.85;
+  margin-bottom: 6px;
+  max-width: 90%;
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-all;
+}
+
+/* ========== 打印样式 ========== */
+@media print {
+  /* 尽量保留渐变/背景色，接近屏幕稿（需在系统打印对话框勾选「背景图形」） */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  html { background: #fff; }
+  body {
+    background: #fff !important;
+    orphans: 3;
+    widows: 3;
+  }
+  .roadbook-container {
+    max-width: 100%;
+    box-shadow: none;
+  }
+  /* 打印保留与屏幕一致的左右分栏；仅无右栏 / minimal 为单列 */
+  .daily-content-page:not(.no-right-column):not(.daily-layout-minimal) {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
+    gap: 10px;
+    min-height: 0;
+  }
+  .daily-content-page.no-right-column,
+  .daily-content-page.daily-layout-minimal {
+    grid-template-columns: 1fr !important;
+  }
+  .daily-top-images {
+    min-height: 0;
+    max-height: none;
+  }
+  .daily-right-column.daily-right-gallery {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    align-self: stretch;
+  }
+  /* 图位固定比例 + 封顶，减少「加载后变高」导致分页抖动 */
+  .daily-right-column .img-wrapper {
+    aspect-ratio: 4 / 3;
+    max-height: 48mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .daily-top-images .img-wrapper {
+    aspect-ratio: 4 / 3;
+    max-height: 52mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .feature-hotel-gallery .feature-hotel-gcell {
+    aspect-ratio: 4 / 3;
+    max-height: 46mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .feature-card-images .img-wrapper {
+    aspect-ratio: 4 / 3;
+    max-height: 48mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .img-wrapper,
+  .page-bg-wrap {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .img-wrapper img,
+  .feature-hotel-gcell img,
+  .page-bg {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  h1, h2, h3,
+  .tl-content h4,
+  .component-kicker,
+  .daily-title-bar,
+  .highlights-title,
+  .feature-card-title,
+  .feature-hotel-sheet-title {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .timeline-container { break-inside: auto; page-break-inside: auto; }
+  p, li { orphans: 3; widows: 3; }
+  /* 已取消组件级强制分页（原 print-page-break-before / 每节 page-break-after） */
+  .feature-hotel-sheet-visual {
+    order: 0 !important;
+    --feature-hotel-visual-max: none !important;
+    min-height: 0;
+    height: auto;
+    max-height: none !important;
+  }
+  .feature-hotel-gallery {
+    min-height: 0;
+    max-height: none;
+    flex: none;
+    height: auto;
+    align-self: stretch;
+  }
+  .feature-card,
+  .feature-hotel-sheet,
+  .textblock-card,
+  .tl-item { break-inside: avoid; page-break-inside: avoid; }
+  /* 取消视口高度撑满（封面单独在下面用打印专用规则） */
+  .itinerary-table-page,
+  .feature-section,
+  .textblock-section {
+    min-height: auto !important;
+  }
+  .textblock-card {
+    min-height: 0 !important;
+  }
+
+  /* ----- A4 专用：顶对齐内容流，消除整页 flex 垂直居中 + vh 带来的空洞留白 ----- */
+  .page-section {
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .page-content {
+    padding: 8mm 7mm !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  .cover-section {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    page-break-after: always;
+    break-after: page;
+    /* 单页封面：A4 可印高度约 297mm - @page 上下边距 */
+    min-height: 275mm !important;
+    height: auto !important;
+    box-sizing: border-box;
+  }
+  .cover-left {
+    position: relative;
+    min-height: 72mm;
+    height: auto !important;
+    align-self: stretch;
+  }
+  .cover-left > .img-wrapper.cover-bg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  .cover-left > .img-wrapper.cover-bg img {
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover;
+  }
+  .cover-right {
+    padding: 8mm 7mm !important;
+    justify-content: flex-start !important;
+  }
+  /* 行程亮点、行程概览标题页：各独占一整页；版心垂直/水平居中（不受全局 page-section 顶对齐影响） */
+  section.page-section.roadbook-component[data-component-type="highlights"] {
+    page-break-after: always !important;
+    break-after: page !important;
+    min-height: 275mm !important;
+    box-sizing: border-box;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  section.page-section.roadbook-component[data-component-type="highlights"] .page-content {
+    justify-content: center !important;
+  }
+  .itinerary-component > .itinerary-title-page.page-section {
+    page-break-after: always !important;
+    break-after: page !important;
+    min-height: 275mm !important;
+    box-sizing: border-box;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  .itinerary-component > .itinerary-title-page.page-section .page-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .itinerary-component > .itinerary-title-page.page-section .section-big-title {
+    text-align: center !important;
+  }
+  .feature-header {
+    min-height: 0 !important;
+    padding: 6mm 5mm !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+  .feature-section .feature-header {
+    min-height: 32mm !important;
+  }
+  .feature-cards {
+    padding: 5mm 5mm 7mm !important;
+  }
+  .feature-card-body {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr) !important;
+    padding: 4mm !important;
+    gap: 3mm !important;
+    align-items: start !important;
+  }
+  .feature-card-body.no-images {
+    grid-template-columns: 1fr !important;
+  }
+  .feature-card-images {
+    max-width: 100% !important;
+    justify-self: stretch !important;
+  }
+  .feature-section.feature-transport .feature-hotel-sheet-visual {
+    --feature-hotel-visual-max: none !important;
+  }
+  .feature-hotel-sheet-body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr) !important;
+    padding: 4mm 5mm !important;
+    gap: 4mm !important;
+    align-items: start !important;
+  }
+  .feature-section.feature-hotel-sheet-section .feature-cards {
+    padding: 5mm 4mm 7mm !important;
+  }
+  .itinerary-table-page {
+    display: block !important;
+    padding: 5mm 4mm !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+  .itinerary-table {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 0.72rem;
+  }
+  .textblock-section {
+    display: block !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    padding: 5mm 4mm !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .textblock-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 6mm 5mm !important;
+  }
+  .textblock-body-panel {
+    min-height: 0 !important;
+  }
+  .daily-left-column {
+    padding: 5mm 5mm 4mm !important;
+  }
+  .daily-top-images {
+    height: auto !important;
+    max-height: 58mm;
+  }
+  /* 每日正文页：一页一版（类幻灯片）；最后一个组件若为 daily，则末尾不再强制换页 */
+  .daily-component .daily-content-page {
+    page-break-after: always !important;
+    break-after: page !important;
+    min-height: 275mm !important;
+    box-sizing: border-box;
+  }
+  #components-container > .roadbook-component-wrapper:last-child .daily-component .daily-content-page {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  .highlights-card {
+    padding: 5mm !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ========== 响应式（仅屏幕；勿用纯 max-width，否则打印页宽常 <768px 会误套手机版式） ========== */
+@media screen and (max-width: 768px) {
+  .cover-section { flex-direction: column; }
+  .cover-left { flex: none; height: 50vh; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+  .cover-right { flex: none; padding: 40px 24px; }
+  .cover-title { font-size: 2rem; }
+  .page-content { padding: 40px 20px; }
+  .highlights-card { padding: 32px 24px; }
+  .daily-content-page { grid-template-columns: 1fr; }
+  .daily-left-column { padding: 28px 18px 12px; }
+  .daily-top-images { height: 200px; }
+  .daily-right-column {
+    padding: 12px 18px 28px;
+    grid-template-rows: auto;
+    grid-auto-rows: minmax(200px, 240px);
+  }
+  /* 窄屏：不强行撑满视高，避免右栏图组过高 */
+  .daily-right-column.daily-right-gallery {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    align-content: start;
+  }
+  .daily-right-gallery--2,
+  .daily-right-gallery--3,
+  .daily-right-gallery--4,
+  .daily-right-gallery--5,
+  .daily-right-gallery--6,
+  .daily-right-gallery--7,
+  .daily-right-gallery--8 {
+    height: auto;
+    grid-template-rows: unset;
+    grid-auto-rows: minmax(160px, 220px);
+  }
+  .daily-right-gallery--3 {
+    grid-template-rows: auto auto;
+  }
+  .daily-right-gallery--3 .img-wrapper:nth-child(1),
+  .daily-right-gallery--3 .img-wrapper:nth-child(2) {
+    max-height: none;
+    aspect-ratio: 4 / 3;
+  }
+  .daily-right-gallery--3 .img-wrapper:nth-child(3) {
+    min-height: 140px;
+  }
+  .daily-right-gallery--4 .img-wrapper,
+  .daily-right-gallery--5 .img-wrapper,
+  .daily-right-gallery--6 .img-wrapper,
+  .daily-right-gallery--7 .img-wrapper,
+  .daily-right-gallery--8 .img-wrapper,
+  .daily-right-gallery--2 .img-wrapper {
+    aspect-ratio: 4 / 3;
+    height: auto;
+  }
+  .daily-right-gallery--1 .img-wrapper {
+    min-height: 200px;
+    max-height: 320px;
+  }
+  .feature-cards { grid-template-columns: 1fr; padding: 24px 16px; }
+  .feature-section.feature-hotel-sheet-section .feature-cards { padding: 24px 12px 36px; }
+  .feature-hotel-sheet-body {
+    grid-template-columns: 1fr;
+    padding: 18px 18px 22px;
+  }
+  .feature-hotel-sheet-head { padding: 18px 18px 14px; }
+  .feature-hotel-sheet-rule { margin: 0 18px; }
+  .feature-hotel-sheet-visual { order: -1; min-height: 0; height: auto; max-height: none; }
+  .feature-hotel-gallery {
+    gap: 8px;
+    height: auto;
+    flex: none;
+    align-content: start;
+  }
+  .feature-hotel-gallery--2,
+  .feature-hotel-gallery--3,
+  .feature-hotel-gallery--4,
+  .feature-hotel-gallery--5,
+  .feature-hotel-gallery--6,
+  .feature-hotel-gallery--7,
+  .feature-hotel-gallery--8 {
+    height: auto;
+    grid-template-rows: unset;
+    grid-auto-rows: minmax(160px, 220px);
+  }
+  .feature-hotel-gallery--3 {
+    grid-template-rows: auto auto;
+  }
+  .feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(1),
+  .feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(2) {
+    max-height: none;
+    aspect-ratio: 4 / 3;
+  }
+  .feature-hotel-gallery--3 .feature-hotel-gcell:nth-child(3) {
+    min-height: 140px;
+  }
+  .feature-hotel-gallery--4 .feature-hotel-gcell,
+  .feature-hotel-gallery--5 .feature-hotel-gcell,
+  .feature-hotel-gallery--6 .feature-hotel-gcell,
+  .feature-hotel-gallery--7 .feature-hotel-gcell,
+  .feature-hotel-gallery--8 .feature-hotel-gcell,
+  .feature-hotel-gallery--2 .feature-hotel-gcell {
+    aspect-ratio: 4 / 3;
+    height: auto;
+  }
+  .feature-hotel-gallery--1 .feature-hotel-gcell {
+    min-height: 200px;
+    max-height: 320px;
+    aspect-ratio: 16 / 10;
+  }
+  .feature-section.feature-transport .feature-hotel-gallery--1 .feature-hotel-gcell {
+    min-height: 160px;
+    max-height: 260px;
+  }
+  .feature-card-body { grid-template-columns: 1fr; }
+  .feature-card-images { max-width: 100%; justify-self: stretch; }
+  .itinerary-table-page { padding: 32px 12px; }
+  .itinerary-table { font-size: 0.8rem; }
+  .itinerary-table thead th, .itinerary-table tbody td { padding: 10px 12px; }
+  .textblock-section { padding: 14px 8px; }
+  .textblock-card { min-height: 72vh; padding: 18px 20px 24px; gap: 10px; }
+  .textblock-title { font-size: 2rem; }
+  .textblock-body-panel { min-height: 280px; padding: 0; }
+  .textblock-section-item h3 { font-size: 1.02rem; }
+  .textblock-section-item .tb-body { font-size: 0.95rem; }
+  .timeline-container { padding: 20px 0; }
+  .tl-item { gap: 12px; }
+  .tl-date { flex: 0 0 50px; }
+  .tl-date .tl-day { font-size: 1.1rem; }
+}
+
+/* ========== 大标题背景编辑控制（z-index 高于 page-overlay / page-content） ========== */
+/*
+ * 问题根因：page-bg-wrap 的 z-index: 0 形成独立层叠上下文，其内部子元素
+ * 无法在视觉上覆盖 z-index: 1/2 的 page-overlay / page-content，导致
+ * img-alt-btn / img-edit-overlay 在背景层不可点击。
+ * 解决方案：在每个带背景图的区块内渲染独立的 .bg-edit-ctrl-area，
+ * 作为直接兄弟元素定位，z-index: 10，与背景 img-wrapper 同级但层级更高。
+ *
+ * 显示策略：非编辑模式隐藏；进入编辑模式（body.editing）后显示；导出/打印时隐藏。
+ */
+.bg-edit-ctrl-area {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+  display: none;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  pointer-events: auto;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+body.editing .bg-edit-ctrl-area {
+  display: flex;
+  opacity: 1;
+}
+.bg-edit-ctrl-area:hover { opacity: 1; }
+body.exporting .bg-edit-ctrl-area { display: none !important; }
+
+.bg-edit-btn {
+  padding: 6px 14px;
+  background: rgba(0,0,0,0.62);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.bg-edit-btn:hover { background: rgba(0,0,0,0.88); }
+
+/* ========== 章节装饰大字（01 / 02 …） ========== */
+.section-num-deco {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 5.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: rgba(255,255,255,0.13);
+  margin-bottom: -12px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ===== 编辑模式样式 ===== */
+
+/* 工具栏 */
+.toolbar {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  gap: 8px;
+  background: rgba(255,255,255,0.95);
+  padding: 10px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+}
+.toolbar button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.toolbar .btn-edit { background: #4facfe; color: white; }
+.toolbar .btn-edit.active { background: #f093fb; }
+.toolbar .btn-save { background: #28a745; color: white; display: none; }
+.toolbar .btn-export { background: #6c757d; color: white; }
+.toolbar .btn-image { background: #17a2b8; color: white; }
+body.editing .btn-save { display: inline-block; }
+
+/* 编辑模式文本标记 */
+body.editing [contenteditable="true"] {
+  outline: 2px dashed #93c5fd;
+  outline-offset: 2px;
+  min-height: 1em;
+}
+
+/* 住宿简介/标题在编辑态不要用 min-height 垫高，否则与退出后高度不一致，图区 max-height 会跳 */
+body.editing .feature-hotel-sheet-copy [contenteditable="true"] {
+  min-height: 0;
+}
+
+body.editing .textblock-rich[contenteditable="true"] {
+  min-height: 3.5em;
+}
+
+body.editing .textblock-rich-editor[contenteditable="true"] {
+  min-height: 16em;
+}
+
+/* 图片编辑蒙层（z-index 低于备选按钮，以便点击「备选」） */
+.img-edit-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 12px;
+  cursor: pointer;
+  pointer-events: none;
+}
+body.editing .img-wrapper { position: relative; }
+body.editing .img-wrapper:hover .img-edit-overlay { opacity: 1; pointer-events: auto; }
+
+/* ========== 备选图片（与 roadbook v1 一致） ========== */
+.img-alt-btn {
+  display: none;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 25;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.img-alt-btn:hover { background: rgba(0,0,0,0.9); }
+body.editing .img-alt-btn { display: block; }
+
+.alt-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.alt-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.alt-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.alt-panel-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+.alt-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.alt-panel-grid img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.alt-panel-grid img:hover {
+  border-color: #4f46e5;
+  transform: scale(1.03);
+}
+.alt-local-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.alt-local-btn:hover { opacity: 0.85; }
+
+/* 组件操作按钮 */
+.component-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: none;
+  gap: 6px;
+  z-index: 100;
+}
+body.editing .component-actions { display: flex; }
+.comp-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+.comp-btn:hover { transform: scale(1.1); }
+.comp-btn-delete { background: #ff4757; color: white; }
+.comp-btn-drag {
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  cursor: grab;
+}
+
+/* 拖拽手柄 */
+.drag-handle {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: none;
+  cursor: grab;
+  font-size: 20px;
+  color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.3);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+body.editing .drag-handle { display: flex; }
+
+/* 拖拽状态 */
+.dragging { opacity: 0.4; transform: scale(0.98); }
+.drag-above { box-shadow: inset 0 4px 0 #4facfe; }
+.drag-below { box-shadow: inset 0 -4px 0 #4facfe; }
+
+/* 组件间插入按钮 */
+.insert-between {
+  height: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+body.editing .insert-between { opacity: 1; height: 48px; }
+.insert-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px dashed #4facfe;
+  background: white;
+  color: #4facfe;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.insert-btn:hover { background: #4facfe; color: white; border-style: solid; }
+
+/* 底部添加（与组件间圆形 + 同款） */
+.add-component-footer {
+  display: none;
+  opacity: 1;
+  height: 56px;
+  padding: 8px 0 32px;
+}
+body.editing .add-component-footer { display: flex; }
+
+/* 模态框 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.active { display: flex; }
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #1a1a2e; }
+.modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+
+/* 组件选择网格 */
+.component-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.picker-item {
+  padding: 16px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  background: #fff;
+}
+.picker-item:hover { border-color: #4facfe; background: #f0f9ff; }
+.picker-item.disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  background: #f7f8fa;
+}
+.picker-item.disabled:hover { border-color: #eee; background: #f7f8fa; }
+.picker-item-icon {
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+.picker-item-name { font-size: 14px; font-weight: 500; color: #333; }
+.picker-item-desc {
+  margin-top: 6px;
+  color: #7b8794;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.picker-item-note {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #7b8794;
+  font-size: 11px;
+}
+
+/* 图片替换模态 */
+.img-modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.img-modal-actions input[type="text"] {
+  width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;
+}
+.img-modal-actions button {
+  padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;
+}
+.img-modal-actions .btn-url { background: #4facfe; color: white; }
+.img-modal-actions .btn-upload { background: #f0f0f0; color: #333; }
+
+/* 打印时隐藏编辑UI（含编辑态下才显示的备选/加图按钮） */
+@media print {
+  .toolbar, .component-actions, .drag-handle, .insert-between,
+  .add-component-footer, .modal-overlay, .img-edit-overlay,
+  .bg-edit-ctrl-area,
+  .img-alt-btn, .daily-zone-add, .daily-img-actions,
+  .hl-item-del, .highlights-item-add, .alt-panel-overlay {
+    display: none !important;
+  }
+  body.editing .feature-hotel-sheet-visual,
+  body.editing .daily-content-page:not(.no-right-column) > .daily-right-column.daily-right-gallery {
+    padding-bottom: 0 !important;
+  }
+  body.editing [contenteditable="true"] {
+    outline: none !important;
+  }
+}
+</style>
+</head>
+<body>
+<!-- 工具栏 -->
+<div class="toolbar">
+  <button class="btn-edit" onclick="toggleEdit()">编辑</button>
+  <button class="btn-save" onclick="saveData()">保存</button>
+  <button class="btn-export" onclick="exportPDF()">导出PDF</button>
+  <button class="btn-image" onclick="exportRoadbookImage()" title="生成长图 PNG（页面较长时可能需要等待）">导出图片</button>
+</div>
+
+<!-- 模态框 -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-content" id="modal-content"></div>
+</div>
+
+<div class="roadbook-container">
+  <div id="cover-container"></div>
+  <div id="components-container"></div>
+  <div class="add-component-footer insert-between">
+    <button type="button" class="insert-btn" title="在末尾添加组件" onclick="showAddComponentPanel(null)">+</button>
+  </div>
+</div>
+
+<script>
+/*TRIPDATA_START*/
+const tripData = TRIP_DATA;
+/*TRIPDATA_END*/
+
+/* ========== 组件注册表 ========== */
+const COMPONENT_TYPES = {
+  highlights: {
+    name: '行程亮点',
+    icon: '01',
+    description: '卖点提炼、亲子体验、行程保障',
+    allowMultiple: false
+  },
+  itinerary: {
+    name: '行程表',
+    icon: '02',
+    description: '时间、地点、交通、线路总览',
+    allowMultiple: false
+  },
+  daily: {
+    name: '每日介绍',
+    icon: '03',
+    description: '按天承载速览、正文和图片槽',
+    allowMultiple: true
+  },
+  feature: {
+    name: '特点介绍',
+    icon: '04',
+    description: '住宿、餐饮、交通等商业卖点',
+    allowMultiple: true,
+    subtypes: ['住宿', '餐饮', '交通', '摄影', '其他']
+  },
+  'text-block': {
+    name: '文字说明',
+    icon: '05',
+    description: '费用、服务、规则、须知等人工确认文本',
+    allowMultiple: true,
+    subtypes: ['费用', '服务', '规则', '须知', '其他']
+  }
+};
+
+const SUBTYPE_META = {
+  '住宿': { label: '精选住宿', className: 'stay', eyebrow: 'STAY' },
+  '餐饮': { label: '在地餐饮', className: 'food', eyebrow: 'TASTE' },
+  '交通': { label: '交通保障', className: 'transport', eyebrow: 'TRANSFER' },
+  '摄影': { label: '影像服务', className: 'photo', eyebrow: 'PHOTO' },
+  '费用': { label: '费用说明', className: 'cost', eyebrow: 'PRICE' },
+  '服务': { label: '服务说明', className: 'service', eyebrow: 'SERVICE' },
+  '规则': { label: '预订规则', className: 'rules', eyebrow: 'POLICY' },
+  /* 须知：与「服务说明」同一客户页标题与版式（导出前由 generate 合并进服务块；编辑端偶发遗留时与费用/服务一致富文本） */
+  '须知': { label: '服务说明', className: 'service', eyebrow: 'SERVICE' },
+  '其他': { label: '定制说明', className: 'other', eyebrow: 'INFO' }
+};
+
+/* ========== 工具函数 ========== */
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/** 纯文案字段：`**加粗**` → `<strong>`（分段 HTML 转义，防 XSS）。不含其它 Markdown。 */
+function escMd(s) {
+  const raw = String(s ?? '');
+  const parts = raw.split('**');
+  if (parts.length === 1) return esc(raw);
+  return parts.map((seg, i) => (i % 2 === 0 ? esc(seg) : '<strong>' + esc(seg) + '</strong>')).join('');
+}
+
+/** 已是 HTML 的正文片段：将其中的 `**…**` 转为 `<strong>`（再走 sanitize）。 */
+function mdBoldSegmentsInHtml(html) {
+  return String(html ?? '').replace(/\*\*([\s\S]+?)\*\*/g, (_, inner) => '<strong>' + esc(inner) + '</strong>');
+}
+
+/** 保存 tripData：DOM 内 `<strong>/<b>` 还原为 `**…**`（与 escMd 对称）。 */
+function htmlInlineToMarkdownBold(el) {
+  if (!el) return '';
+  let out = '';
+  el.childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) out += node.textContent;
+    else if (node.nodeType === Node.ELEMENT_NODE) {
+      const t = node.tagName.toLowerCase();
+      if (t === 'strong' || t === 'b') out += '**' + htmlInlineToMarkdownBold(node) + '**';
+      else if (t === 'br') out += '\n';
+      else out += htmlInlineToMarkdownBold(node);
+    }
+  });
+  return out;
+}
+
+/** 路书富文本：渲染前剔除危险标签与事件属性（数据来自本方 tripData / 人工编辑） */
+function sanitizeRoadbookRichHtml(html) {
+  const raw = String(html ?? '').trim();
+  if (!raw) return '';
+  const tpl = document.createElement('template');
+  tpl.innerHTML = raw;
+  tpl.content.querySelectorAll('script,iframe,object,embed,link,meta,style,form').forEach(n => n.remove());
+  tpl.content.querySelectorAll('*').forEach(el => {
+    [...el.attributes].forEach(attr => {
+      const n = attr.name;
+      const v = attr.value || '';
+      if (/^on/i.test(n) || (n === 'href' && /^\s*javascript:/i.test(v))) el.removeAttribute(n);
+    });
+  });
+  return tpl.innerHTML.trim();
+}
+
+/** 将旧版 sections[] 转为纯文本行（仅用于一次性迁入单块富文本） */
+function deriveTextblockLinesFromLegacySections(sections) {
+  const out = [];
+  if (!Array.isArray(sections)) return out;
+  for (const sec of sections) {
+    const h = String(sec.heading || '').trim();
+    const body = String(sec.body || '').trim();
+    if (!body && !h) continue;
+    const parts = body.split(/[；;\n\r]+/).map(s => s.trim()).filter(Boolean);
+    if (!parts.length) {
+      if (h) out.push(h);
+      continue;
+    }
+    parts.forEach((p, i) => {
+      if (i === 0 && h) out.push(`${h}：${p}`);
+      else out.push(p);
+    });
+  }
+  return out;
+}
+
+/** 费用/服务：合并 lines·sections·content 为单一富文本 HTML（编辑区整页一大块） */
+function buildSimpleRichEditorInnerHtml(d) {
+  const rawContent = d.content != null ? String(d.content).trim() : '';
+  let lines = Array.isArray(d.lines) ? d.lines.map(x => String(x).trim()).filter(Boolean) : [];
+  if (!lines.length) {
+    lines = deriveTextblockLinesFromLegacySections(Array.isArray(d.sections) ? d.sections : []);
+  }
+  const listPart = lines.length
+    ? `<ul class="textblock-lines textblock-rich-bullets">${lines.map(line => `<li>${escMd(line)}</li>`).join('')}</ul>`
+    : '';
+  if (listPart && rawContent) return listPart + mdBoldSegmentsInHtml(rawContent);
+  if (rawContent) return mdBoldSegmentsInHtml(rawContent);
+  if (listPart) return listPart;
+  return '';
+}
+
+/** 费用/服务/须知：正文合并为单块富文本（须知在交付侧已并入服务说明块；此处保证遗留数据版式与费用/服务一致） */
+function isTextblockMergedRichSubtype(subtype) {
+  return subtype === '费用' || subtype === '服务' || subtype === '须知';
+}
+
+/** 生成 CSS background-image 可用的 url('…')，避免在 HTML style 属性里用 &quot; 嵌套导致部分浏览器不渲染 */
+function cssBgUrlValue(src) {
+  if (!src) return 'none';
+  const s = String(src).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return `url('${s}')`;
+}
+
+function cssUrlStyle(url) {
+  const u = String(url || '').trim();
+  if (!u) return '';
+  return ` style="background-image: ${cssBgUrlValue(u)} !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;"`;
+}
+
+function getSubtypeMeta(subtype) {
+  return SUBTYPE_META[subtype] || SUBTYPE_META['其他'];
+}
+
+function renderComponentKicker(label, eyebrow) {
+  if (!label && !eyebrow) return '';
+  return `<div class="component-kicker"><span>${escMd(eyebrow || 'CUSTOM')}</span>${escMd(label || '')}</div>`;
+}
+
+function normalizeClassName(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'custom';
+}
+
+/** 图片槽 JSON 路径 → 可读标签（便于按「地点/字段」识别素材槽位） */
+function humanizeSlotPath(path) {
+  if (!path) return '图片槽';
+  const p = String(path).replace(/^\//, '');
+  const parts = p.split('/').filter(Boolean);
+  const map = {
+    backgroundImage: '背景图',
+    topImages: '顶部配图',
+    bottomImages: '底部配图',
+    sideImage: '侧栏大图',
+    logo: 'Logo',
+    cover: '封面',
+    images: '配图',
+    items: '条目'
+  };
+  const readable = parts.map(seg => map[seg] || (/^\d+$/.test(seg) ? `#${parseInt(seg, 10) + 1}` : seg)).join(' · ');
+  return readable || path;
+}
+
+/** 从条目解析出 URL（备选列表始终为纯字符串 URL） */
+function extractImageUrl(item) {
+  if (item == null || item === '') return '';
+  if (typeof item === 'string') return item.trim();
+  if (typeof item === 'object' && !Array.isArray(item)) {
+    const u = item.url || item.src || item.href;
+    return typeof u === 'string' ? u.trim() : '';
+  }
+  return '';
+}
+
+function extractSlotLabel(item) {
+  if (item != null && typeof item === 'object' && !Array.isArray(item)) {
+    const sl = item.slotLabel || item.label || item.placeName;
+    return typeof sl === 'string' ? sl.trim() : '';
+  }
+  return '';
+}
+
+function uniqueUrls(urls) {
+  const out = [];
+  const seen = new Set();
+  for (const raw of (Array.isArray(urls) ? urls : [])) {
+    const u = String(raw || '').trim();
+    if (!u || seen.has(u)) continue;
+    seen.add(u);
+    out.push(u);
+  }
+  return out;
+}
+
+/** 空槽（仅占位、无有效主图）：装饰时自动从同组其余槽同步备选，右下角与有图槽一致显示「备选」 */
+function isEmptySlotForPoolAlts(wrap) {
+  if (!wrap) return false;
+  if (wrap.querySelector(':scope > .img-placeholder')) return true;
+  const img = wrap.querySelector(':scope > img');
+  if (!img) return true;
+  const src = String(img.getAttribute('src') || '').trim();
+  return !src;
+}
+
+function collectUrlsFromImageWrapperForPool(wrap) {
+  const out = [];
+  const img = wrap.querySelector(':scope > img');
+  if (img) {
+    const s = String(img.getAttribute('src') || img.src || '').trim();
+    if (s) out.push(s);
+  }
+  try {
+    const alts = JSON.parse(wrap.dataset.alts || '[]');
+    if (Array.isArray(alts)) {
+      for (const u of alts) {
+        if (u) out.push(String(u).trim());
+      }
+    }
+  } catch (_) { /* ignore */ }
+  return uniqueUrls(out);
+}
+
+/** 空槽：将同组（住宿/交通 gallery、每日顶部图区、每日右栏）其余槽的主图与备选写入本槽 data-alts，右下角显示「备选」 */
+function syncEmptySlotAltsFromSiblings(wrapper) {
+  if (!isEmptySlotForPoolAlts(wrapper)) return;
+  const gallery = wrapper.closest('.feature-hotel-gallery');
+  const rightCol = wrapper.closest('.daily-right-column');
+  const topZone = wrapper.closest('.daily-top-images');
+  const container = gallery || rightCol || topZone;
+  if (!container || !wrapper.classList.contains('img-wrapper')) return;
+  const siblings = Array.from(container.querySelectorAll(':scope > .img-wrapper')).filter((w) => w !== wrapper);
+  const pooled = [];
+  siblings.forEach((w) => {
+    pooled.push(...collectUrlsFromImageWrapperForPool(w));
+  });
+  const merged = uniqueUrls(pooled);
+  wrapper.dataset.alts = JSON.stringify(merged);
+  refreshAltButton(wrapper, merged);
+  refreshSlotHint(wrapper);
+  if (merged.length > 0) {
+    applyImage(wrapper, merged[0]);
+  }
+}
+
+/**
+ * string | string[]（备选）
+ * { url, slotLabel } | { alternates: [], slotLabel } — 与地点名绑定
+ */
+function normalizeImageEntry(entry) {
+  const empty = { primary: '', alts: [], slotLabel: '' };
+  if (entry == null || entry === '') return empty;
+
+  if (typeof entry === 'object' && !Array.isArray(entry)) {
+    const slotLabel = extractSlotLabel(entry);
+    const direct = extractImageUrl(entry);
+    let fromAlts = [];
+    if (Array.isArray(entry.alternates)) {
+      fromAlts = uniqueUrls(entry.alternates.map(extractImageUrl).filter(Boolean));
+    }
+    // alternates 含占位空串时不能只走备选分支，否则会丢掉同对象上的 url/src
+    const urls = finalizeImageUrlList(direct ? [direct, ...fromAlts] : fromAlts);
+    if (urls.length) {
+      return { primary: urls[0], alts: urls, slotLabel };
+    }
+    return { primary: '', alts: [], slotLabel };
+  }
+
+  if (Array.isArray(entry)) {
+    const urls = [];
+    let slotLabel = '';
+    for (const item of entry) {
+      if (item == null || item === '') continue;
+      const u = extractImageUrl(item);
+      if (u) urls.push(u);
+      if (!slotLabel) slotLabel = extractSlotLabel(item);
+    }
+    const unique = finalizeImageUrlList(urls);
+    return { primary: unique[0] || '', alts: unique, slotLabel };
+  }
+
+  const one = finalizeImageUrlList([String(entry).trim()])[0] || '';
+  return { primary: one, alts: one ? [one] : [], slotLabel: '' };
+}
+
+/** 预览服务写入的 127.0.0.1 / localhost 绝对 URL → 与 HTML 同级的 roadbook-images 相对路径 */
+function resolveExportMediaUrl(src) {
+  let s = String(src || '').trim();
+  if (!s || s.startsWith('data:') || s.startsWith('blob:')) return s;
+  const dev = s.match(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\/(roadbook-images\/[^?#]+)/i);
+  if (dev) return dev[1];
+  if (s.startsWith('/roadbook-images/')) return s.slice(1);
+  try {
+    const u = new URL(s, document.baseURI || window.location.href);
+    const marker = '/roadbook-images/';
+    const idx = u.pathname.indexOf(marker);
+    if (idx >= 0) {
+      const rel = u.pathname.slice(idx + 1);
+      if (u.hostname === '127.0.0.1' || u.hostname === 'localhost') return rel;
+      if (u.origin === window.location.origin) return rel;
+    }
+  } catch (_) { /* ignore */ }
+  return s;
+}
+
+function roadbookPublicApiBase() {
+  const cfg = window.__CRM_ROADBOOK_PREVIEW__ || {};
+  const base = String(cfg.apiBase || '/api').replace(/\/$/, '');
+  return base || '/api';
+}
+
+function proxyExportMediaUrl(src) {
+  const s = String(src || '').trim();
+  if (!s || s.startsWith('data:') || s.startsWith('blob:')) return s;
+  try {
+    const u = new URL(s, document.baseURI || window.location.href);
+    if (!/^https?:$/i.test(u.protocol)) return s;
+    if (u.pathname.includes('/api/public/roadbook/proxy-image')) return s;
+    return `${roadbookPublicApiBase()}/public/roadbook/proxy-image?url=${encodeURIComponent(u.href)}`;
+  } catch (_) {
+    return s;
+  }
+}
+
+function finalizeImageUrlList(urls) {
+  const normalized = uniqueUrls((urls || []).map(resolveExportMediaUrl).filter(Boolean));
+  normalized.sort((a, b) => {
+    const rank = (u) => {
+      if (u.startsWith('roadbook-images/')) return 0;
+      if (/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i.test(u)) return 2;
+      return 1;
+    };
+    return rank(a) - rank(b);
+  });
+  return normalized;
+}
+function compositeSlotHint(path, slotLabel) {
+  const p = humanizeSlotPath(path || '');
+  const sl = (slotLabel || '').trim();
+  return sl ? `${sl} · ${p}` : p;
+}
+
+function refreshSlotHint(wrapper) {
+  if (!wrapper) return;
+  const path = wrapper.dataset.path || '';
+  const sl = (wrapper.dataset.slotLabel || '').trim();
+  wrapper.dataset.slotHint = compositeSlotHint(path, sl);
+}
+
+function altButtonHtml(alts) {
+  if (!Array.isArray(alts) || alts.length < 1) return '';
+  const label = alts.length > 1 ? `备选 ${alts.length}张` : '备选';
+  return `<button type="button" class="img-alt-btn" data-alts="${esc(JSON.stringify(alts))}">${label}</button>`;
+}
+
+function renderImage(entry, alt, dataPath, classes) {
+  let { primary, alts, slotLabel } = normalizeImageEntry(entry);
+  if (!primary && Array.isArray(alts) && alts.length) {
+    primary = alts[0];
+    alts = uniqueUrls([primary, ...alts]);
+  }
+  const cls = classes || '';
+  const btn = altButtonHtml(alts);
+  const da = esc(JSON.stringify(alts));
+  const hint = esc(compositeSlotHint(dataPath, slotLabel));
+  const dsl = slotLabel ? ` data-slot-label="${esc(slotLabel)}"` : '';
+  if (primary) {
+    return `<div class="img-wrapper ${cls}" data-path="${esc(dataPath || '')}" data-slot-hint="${hint}"${dsl} data-alts="${da}">
+      <img src="${esc(primary)}" alt="${esc(alt || '')}" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer">
+      ${btn}</div>`;
+  }
+  return `<div class="img-wrapper ${cls}" data-path="${esc(dataPath || '')}" data-slot-hint="${hint}"${dsl} data-alts="${da}">
+    <div class="img-placeholder"><span>${esc(alt || '暂无图片')}</span><small>${hint}</small></div>
+    ${btn}</div>`;
+}
+
+function tryNextImage(wrapper) {
+  if (!wrapper) return false;
+  let img = wrapper.querySelector('img.page-bg') || wrapper.querySelector('img');
+  if (!img && wrapper.classList.contains('page-bg-wrap')) {
+    const ph = wrapper.querySelector('.page-bg-placeholder');
+    if (ph) {
+      img = document.createElement('img');
+      img.className = 'page-bg';
+      img.alt = '';
+      img.loading = 'eager';
+      img.decoding = 'async';
+      ph.replaceWith(img);
+    }
+  }
+  if (!img) return false;
+  let alts = [];
+  try {
+    alts = JSON.parse(wrapper.dataset.alts || '[]');
+  } catch (_) {
+    alts = [];
+  }
+  const candidates = uniqueUrls(alts);
+  const failed = new Set((wrapper.dataset.failedUrls || '').split('||').filter(Boolean));
+  failed.add(img.src);
+  wrapper.dataset.failedUrls = Array.from(failed).join('||');
+  const next = candidates.find((u) => u && !failed.has(u));
+  if (!next) return false;
+  img.src = next;
+  if (wrapper.classList.contains('page-bg-wrap') || wrapper.dataset.path === '/cover/backgroundImage') {
+    wrapper.style.backgroundImage = cssBgUrlValue(next);
+  }
+  return true;
+}
+
+function primaryImageUrl(entry) {
+  return normalizeImageEntry(entry).primary || '';
+}
+
+function isTitleBackgroundWrapper(wrapper) {
+  return !!wrapper && (
+    wrapper.classList.contains('page-bg-wrap') ||
+    wrapper.dataset.path === '/cover/backgroundImage'
+  );
+}
+
+function applyTitleBackground(wrapper, src) {
+  if (!isTitleBackgroundWrapper(wrapper) || !src) return;
+  wrapper.querySelectorAll('.page-bg-placeholder, .cover-img-placeholder, .img-placeholder').forEach(el => el.remove());
+  const cleanSrc = String(src).trim();
+  if (!cleanSrc) return;
+  const coverMainImg = wrapper.dataset.path === '/cover/backgroundImage'
+    ? wrapper.querySelector('img:not(.cover-logo)') : null;
+  if (coverMainImg && coverMainImg.tagName === 'IMG' && !coverMainImg.classList.contains('page-bg')) {
+    wrapper.style.removeProperty('background-image');
+    coverMainImg.style.display = 'block';
+    coverMainImg.style.opacity = '1';
+    if (coverMainImg.getAttribute('src') !== cleanSrc) coverMainImg.src = cleanSrc;
+    delete wrapper.dataset.failedUrls;
+    wrapper.dataset.currentSrc = cleanSrc;
+    return;
+  }
+  wrapper.style.setProperty('background-image', cssBgUrlValue(cleanSrc), 'important');
+  wrapper.style.setProperty('background-size', 'cover', 'important');
+  wrapper.style.setProperty('background-position', 'center', 'important');
+  wrapper.style.setProperty('background-repeat', 'no-repeat', 'important');
+  let bgLayer = wrapper.querySelector('.page-bg');
+  if (!bgLayer) {
+    const legacy = wrapper.querySelector('img');
+    if (legacy && wrapper.classList.contains('page-bg-wrap') && !legacy.classList.contains('page-bg')) {
+      legacy.classList.add('page-bg');
+    }
+    bgLayer = wrapper.querySelector('.page-bg') || wrapper.querySelector('img');
+  }
+  if (bgLayer) {
+    if (bgLayer.tagName === 'IMG') {
+      bgLayer.style.display = 'block';
+      bgLayer.style.opacity = '1';
+      if (bgLayer.getAttribute('src') !== cleanSrc) bgLayer.src = cleanSrc;
+      delete wrapper.dataset.failedUrls;
+    } else {
+      bgLayer.style.backgroundImage = cssBgUrlValue(cleanSrc);
+    }
+  } else if (wrapper.classList.contains('page-bg-wrap')) {
+    const img = document.createElement('img');
+    img.className = 'page-bg';
+    img.alt = '';
+    img.loading = 'eager';
+    img.decoding = 'async';
+    img.src = cleanSrc;
+    img.style.display = 'block';
+    img.style.opacity = '1';
+    wrapper.insertBefore(img, wrapper.firstChild);
+    delete wrapper.dataset.failedUrls;
+  }
+  wrapper.dataset.currentSrc = cleanSrc;
+}
+
+function preloadTitleBackground(wrapper) {
+  if (!isTitleBackgroundWrapper(wrapper)) return;
+  // 直接取 primary（alts[0]）或 img.src，同步设置 background-image，
+  // 不再用 probe 异步探测（跨域图片 onload 不可靠）。
+  // <img class="page-bg"> 的 onerror 机制负责备选切换。
+  const alts = getWrapperAlts(wrapper);
+  const imgEl = wrapper.querySelector('img.page-bg') || wrapper.querySelector('img:not(.cover-logo)');
+  const current = imgEl ? (imgEl.getAttribute('src') || '') : '';
+  const primary = alts[0] || current;
+  if (!primary) return;
+  // 确保 img.src 已设置（renderBgImageSlot 已写入，这里做兜底）
+  if (imgEl && !imgEl.getAttribute('src')) imgEl.src = primary;
+  // 封面主图：仅依赖 <img>，避免 wrapper 与 img 双图层刷新导致闪烁
+  if (wrapper.dataset.path === '/cover/backgroundImage' && imgEl && imgEl.tagName === 'IMG' && !imgEl.classList.contains('page-bg')) {
+    return;
+  }
+  // 章节大标题等：同步写入 background-image，让背景立即可见
+  // 使用 setProperty + important 确保不被任何 CSS 规则覆盖
+  wrapper.style.setProperty('background-image', cssBgUrlValue(primary), 'important');
+  wrapper.style.setProperty('background-size', 'cover', 'important');
+  wrapper.style.setProperty('background-position', 'center', 'important');
+  wrapper.style.setProperty('background-repeat', 'no-repeat', 'important');
+}
+
+function hydrateTitleBackgrounds() {
+  document.querySelectorAll('.page-bg-wrap, .img-wrapper[data-path="/cover/backgroundImage"]').forEach(preloadTitleBackground);
+}
+
+/** 全屏/通栏背景图（page-bg）。备选 URL 在 data-alts；编辑态「备选」仅来自同区块 .bg-edit-ctrl-area，避免与右下角 .img-alt-btn 重复。 */
+function renderBgImageSlot(entry, dataPath) {
+  const { primary, alts, slotLabel } = normalizeImageEntry(entry);
+  const da = esc(JSON.stringify(alts));
+  const hint = esc(compositeSlotHint(dataPath, slotLabel));
+  const dsl = slotLabel ? ` data-slot-label="${esc(slotLabel)}"` : '';
+  if (primary) {
+    return `<div class="page-bg-wrap img-wrapper" data-path="${esc(dataPath || '')}" data-slot-hint="${hint}"${dsl} data-alts="${da}"${cssUrlStyle(primary)}>
+      <img class="page-bg" src="${esc(primary)}" alt="${esc(slotLabel || '')}" loading="eager" fetchpriority="high" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer"></div>`;
+  }
+  return `<div class="page-bg-wrap img-wrapper" data-path="${esc(dataPath || '')}" data-slot-hint="${hint}"${dsl} data-alts="${da}">
+    <div class="page-bg-placeholder"></div></div>`;
+}
+
+/* ========== 主渲染入口 ========== */
+function renderAll() {
+  renderCover(tripData.cover);
+  const container = document.getElementById('components-container');
+  container.innerHTML = '';
+  let dailyIndex = 0;
+  let isFirstDaily = true;
+  tripData.components.forEach((comp, idx) => {
+    renderComponent(container, comp, idx, isFirstDaily);
+    if (comp.type === 'daily') {
+      isFirstDaily = false;
+      dailyIndex++;
+    }
+  });
+}
+
+document.addEventListener('error', function (event) {
+  const target = event.target;
+  if (!(target instanceof HTMLImageElement)) return;
+  const wrapper = target.closest('.img-wrapper');
+  if (!wrapper) return;
+  const switched = tryNextImage(wrapper);
+  if (!switched) {
+    // 背景图槽位失败时使用全幅背景占位，避免整页看起来“没图/发黑”
+    if (wrapper.classList.contains('page-bg-wrap')) {
+      const bgPh = document.createElement('div');
+      bgPh.className = 'page-bg-placeholder';
+      target.replaceWith(bgPh);
+      return;
+    }
+    // 封面主图失败时保留封面风格占位
+    if (wrapper.dataset.path === '/cover/backgroundImage') {
+      const coverPh = document.createElement('div');
+      coverPh.className = 'cover-img-placeholder';
+      coverPh.textContent = '路书';
+      target.replaceWith(coverPh);
+      return;
+    }
+    const ph = document.createElement('div');
+    ph.className = 'img-placeholder';
+    ph.innerHTML = '<span>图片加载失败</span><small>可在编辑模式中替换或选择备选图</small>';
+    target.replaceWith(ph);
+  }
+}, true);
+
+/* ========== 封面渲染 ========== */
+/** 客户交付版：不展示 intake / 内部编辑说明类副标题 */
+function shouldOmitCoverSubtitle(text) {
+  const s = String(text || '').trim();
+  if (!s) return true;
+  if (s === '定制旅行 · 可编辑交付版') return true;
+  if (/可编辑交付|测试数据|内部测试|placeholder|草稿|\bdraft\b/i.test(s)) return true;
+  return false;
+}
+
+function renderCover(cover) {
+  if (!cover) return;
+  const container = document.getElementById('cover-container');
+  const { primary: bgPrimary, alts: bgAlts, slotLabel: bgSlot } = normalizeImageEntry(cover.backgroundImage);
+  const bgDa = esc(JSON.stringify(bgAlts));
+  const covHint = esc(compositeSlotHint('/cover/backgroundImage', bgSlot));
+  const bgDsl = bgSlot ? ` data-slot-label="${esc(bgSlot)}"` : '';
+  const bgBlock = bgPrimary
+    ? `<div class="img-wrapper cover-bg" data-path="/cover/backgroundImage" data-slot-hint="${covHint}"${bgDsl} data-alts="${bgDa}"><img src="${esc(bgPrimary)}" alt="${esc(cover.title || '')}" loading="eager" fetchpriority="high" decoding="async"></div>`
+    : `<div class="img-wrapper cover-bg" data-path="/cover/backgroundImage" data-slot-hint="${covHint}"${bgDsl} data-alts="${bgDa}"><div class="cover-img-placeholder">${esc((cover.title || '路书').slice(0, 4))}</div></div>`;
+
+  const { primary: logoPrimary, alts: logoAlts, slotLabel: logoSlot } = normalizeImageEntry(cover.logo);
+  const logoBtn = altButtonHtml(logoAlts);
+  const logoDa = esc(JSON.stringify(logoAlts));
+  const logoHint = esc(compositeSlotHint('/cover/logo', logoSlot));
+  const logoDsl = logoSlot ? ` data-slot-label="${esc(logoSlot)}"` : '';
+  const logoHtml = logoPrimary
+    ? `<div class="img-wrapper cover-logo-wrap" data-path="/cover/logo" data-slot-hint="${logoHint}"${logoDsl} data-alts="${logoDa}"><img class="cover-logo" src="${esc(logoPrimary)}" alt="Logo" loading="lazy" decoding="async">${logoBtn}</div>`
+    : '';
+  const coverMeta = tripData.meta?.title || cover.meta || '定制旅行路书';
+  const rawSubtitle = String(cover.subtitle || '').trim();
+  const subtitleHtml = shouldOmitCoverSubtitle(rawSubtitle)
+    ? ''
+    : `<p class="cover-subtitle" contenteditable="false" data-field="subtitle" data-component-id="cover" data-copy-md="1">${escMd(rawSubtitle)}</p>`;
+
+  container.innerHTML = `
+    <div class="cover-section">
+      <div class="cover-left">
+        ${bgBlock}
+        <div class="bg-edit-ctrl-area"></div>
+      </div>
+      <div class="cover-right">
+        <div class="cover-eyebrow">PRIVATE CUSTOM JOURNEY</div>
+        ${logoHtml}
+        <h1 class="cover-title" contenteditable="false" data-field="title" data-component-id="cover" data-copy-md="1">${escMd(cover.title || '旅行路书')}</h1>
+        ${subtitleHtml}
+        <div class="cover-meta-card" data-copy-md="1">${escMd(coverMeta)}</div>
+      </div>
+    </div>`;
+}
+
+/* ========== 组件分派 ========== */
+function renderComponent(container, comp, idx, isFirstDaily) {
+  const wrap = document.createElement('div');
+  wrap.className = 'roadbook-component-wrapper';
+  wrap.dataset.componentIndex = String(idx);
+  container.appendChild(wrap);
+  switch(comp.type) {
+    case 'highlights': renderHighlights(wrap, comp, idx); break;
+    case 'itinerary':  renderItinerary(wrap, comp, idx); break;
+    case 'daily':      renderDaily(wrap, comp, idx, isFirstDaily); break;
+    case 'feature':    renderFeature(wrap, comp, idx); break;
+    case 'text-block': renderTextBlock(wrap, comp, idx); break;
+  }
+}
+
+/* ========== 行程亮点 ========== */
+function renderHighlights(container, comp, idx) {
+  const d = comp.data || {};
+  const bgHtml = renderBgImageSlot(d.backgroundImage, 'backgroundImage');
+  const defaultContent = '本路书基于客户提供的行程简表自动结构化生成，可继续编辑文字、替换图片并导出用于客户交付。';
+  const itemsHtml = Array.isArray(d.items) && d.items.length
+    ? `<ul class="highlights-items">${d.items.map((item, i) =>
+        `<li>
+          <span class="highlights-item-text" contenteditable="false" data-field="items/${i}" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item)}</span>
+          <button type="button" class="hl-item-del" title="删除此条">×</button>
+        </li>`
+      ).join('')}</ul>`
+    : '<ul class="highlights-items"></ul>';
+  const contentText = String(d.content || '').trim();
+  const contentHtml = contentText && contentText !== defaultContent
+    ? `<div class="highlights-content" contenteditable="false" data-field="content" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.content)}</div>`
+    : '';
+  const numHtml = d.sectionNum ? `<span class="section-num-deco">${esc(d.sectionNum)}</span>` : '';
+  const kicker = renderComponentKicker('行程卖点', 'HIGHLIGHTS');
+  const section = document.createElement('div');
+  section.innerHTML = `
+    <section class="page-section roadbook-component" data-component-type="highlights" data-component-id="${esc(comp.id)}">
+      ${bgHtml}
+      <div class="page-overlay"></div>
+      <div class="page-content" style="display:flex;flex-direction:column;align-items:center;">
+        ${numHtml}
+        ${kicker}
+        <h2 class="highlights-title" contenteditable="false" data-field="title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.title || '行程亮点')}</h2>
+        <div class="highlights-card">
+          ${contentHtml}
+          ${itemsHtml}
+          <button type="button" class="highlights-item-add">+ 新增亮点</button>
+        </div>
+      </div>
+      <div class="bg-edit-ctrl-area"></div>
+    </section>`;
+  container.appendChild(section.firstElementChild);
+}
+
+function reindexHighlightItems(section) {
+  const compId = section?.dataset?.componentId || '';
+  const itemEls = section.querySelectorAll('.highlights-items .highlights-item-text');
+  itemEls.forEach((el, idx) => {
+    el.dataset.field = `items/${idx}`;
+    if (compId) el.dataset.componentId = compId;
+  });
+}
+
+/* ========== 行程表 ========== */
+function formatDayLabel(day) {
+  if (day == null || day === '') return '';
+  const s = String(day).trim();
+  if (/^day\s*\d/i.test(s)) return s;
+  return 'Day' + s;
+}
+
+function detectDayFromDate(dateText) {
+  const s = String(dateText || '').trim();
+  if (!s) return '';
+  const m = s.match(/day\s*([0-9]+)/i);
+  if (m) return `DAY ${m[1]}`;
+  return '';
+}
+
+function stripDayPrefixFromDate(dateText) {
+  const s = String(dateText || '').trim();
+  if (!s) return '';
+  return s.replace(/^day\s*[0-9]+\s*/i, '').trim();
+}
+
+function decideTopDisplayLimit(topEntries) {
+  const count = Array.isArray(topEntries) ? topEntries.length : 0;
+  if (count <= 0) return 0;
+  /* 每日顶部默认展示 3 槽；大图仅在 sync 中用 cols-2-hero 微调列宽 */
+  return Math.min(3, count);
+}
+
+function resolveDailyLayoutTemplate(dailyData, rightImageCount) {
+  const allowed = new Set(['classic', 'focus', 'gallery', 'minimal']);
+  const manual = String(dailyData?.layoutTemplate || '').trim().toLowerCase();
+  if (allowed.has(manual)) return manual === 'gallery' ? 'classic' : manual;
+  if (rightImageCount <= 0) return 'minimal';
+  if (rightImageCount === 1) return 'focus';
+  return 'classic';
+}
+
+function renderItinerary(container, comp, idx) {
+  const d = comp.data || {};
+  const bgHtml = renderBgImageSlot(d.backgroundImage, 'backgroundImage');
+
+  const bundle = document.createElement('div');
+  bundle.className = 'roadbook-component itinerary-component';
+  bundle.setAttribute('data-component-type', 'itinerary');
+  bundle.setAttribute('data-component-id', comp.id);
+
+  // 标题页
+  const itNumHtml = d.sectionNum ? `<span class="section-num-deco">${esc(d.sectionNum)}</span>` : '';
+  const itKicker = renderComponentKicker('行程总览', 'OVERVIEW');
+  const titlePage = document.createElement('section');
+  titlePage.className = 'page-section itinerary-title-page';
+  titlePage.innerHTML = `
+    ${bgHtml}
+    <div class="page-overlay"></div>
+    <div class="page-content">
+      ${itNumHtml}
+      ${itKicker}
+      <h2 class="section-big-title" contenteditable="false" data-field="title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.title || '行程概览')}</h2>
+    </div>
+    <div class="bg-edit-ctrl-area"></div>`;
+  bundle.appendChild(titlePage);
+
+  // 内容页（表格：对齐需求文档「时间、地点、交通、线路」类表格）
+  const contentPage = document.createElement('div');
+  const items = Array.isArray(d.items) ? d.items : [];
+
+  if (d.style === 'timeline') {
+    contentPage.className = 'itinerary-table-page';
+    contentPage.innerHTML = `<div class="timeline-container">${items.map((item, ri) => `
+      <div class="tl-item">
+        <div class="tl-date">
+          <span class="tl-day">${esc(formatDayLabel(item.day))}</span>
+          <span class="tl-datestr" contenteditable="false" data-field="items/${ri}/date" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.date || '')}</span>
+        </div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <h4 contenteditable="false" data-field="items/${ri}/title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.title || '')}</h4>
+          <p contenteditable="false" data-field="items/${ri}/locations" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.locations || '')}</p>
+          <p style="margin-top:8px;font-size:0.8rem;color:#5a6a7e;">
+            <span contenteditable="false" data-field="items/${ri}/time" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.time || '')}</span>
+            ${item.time && item.transport ? ' · ' : ''}
+            <span contenteditable="false" data-field="items/${ri}/transport" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.transport || '')}</span>
+          </p>
+        </div>
+      </div>`).join('')}</div>`;
+  } else {
+    contentPage.className = 'itinerary-table-page';
+    contentPage.innerHTML = `
+      <table class="itinerary-table">
+        <thead><tr>
+          <th>Day</th><th>日期</th><th>时间</th><th>行程</th><th>路线/地点</th><th>交通</th><th>里程</th><th>住宿</th><th>餐食</th>
+        </tr></thead>
+        <tbody>${items.map((item, ri) => `
+          <tr>
+            <td contenteditable="false" data-field="items/${ri}/day" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(formatDayLabel(item.day))}</td>
+            <td contenteditable="false" data-field="items/${ri}/date" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.date || '')}</td>
+            <td class="itinerary-time" contenteditable="false" data-field="items/${ri}/time" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.time || '')}</td>
+            <td contenteditable="false" data-field="items/${ri}/title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.title || '')}</td>
+            <td contenteditable="false" data-field="items/${ri}/locations" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.locations || '')}</td>
+            <td contenteditable="false" data-field="items/${ri}/transport" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.transport || '')}</td>
+            <td contenteditable="false" data-field="items/${ri}/distance" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.distance || '')}</td>
+            <td contenteditable="false" data-field="items/${ri}/accommodation" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.accommodation || '')}</td>
+            <td contenteditable="false" data-field="items/${ri}/meals" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.meals || '')}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+  bundle.appendChild(contentPage);
+  container.appendChild(bundle);
+}
+
+/* ========== 每日行程 ========== */
+
+/** 每日右侧单槽：是否与旧逻辑一致视为「有数据」（含仅有对象占位） */
+function dailyRightSlotHasRenderableContent(entry) {
+  if (entry == null || entry === '') return false;
+  if (primaryImageUrl(entry)) return true;
+  if (typeof entry === 'object' && !Array.isArray(entry)) return true;
+  if (Array.isArray(entry) && entry.length) return true;
+  return false;
+}
+
+/**
+ * 右侧图位：按数据从左到右裁剪，最少 2 格、最多 8 格（sideImage + bottomImages/0..6）。
+ */
+function buildDailyRightSlotsForLayout(d) {
+  const bottomArr = Array.isArray(d.bottomImages) ? d.bottomImages : [];
+  const slots = [];
+  slots.push({
+    entry: d.sideImage !== undefined && d.sideImage !== null ? d.sideImage : '',
+    path: 'sideImage',
+  });
+  for (let i = 0; i < 7; i++) {
+    const e = bottomArr[i];
+    slots.push({
+      entry: e !== undefined && e !== null ? e : '',
+      path: `bottomImages/${i}`,
+    });
+  }
+  let lastIdx = -1;
+  slots.forEach((s, i) => {
+    if (dailyRightSlotHasRenderableContent(s.entry)) lastIdx = i;
+  });
+  const renderCount = lastIdx < 0 ? 2 : Math.min(8, Math.max(2, lastIdx + 1));
+  return slots.slice(0, renderCount);
+}
+
+function renderDaily(container, comp, idx, isFirstDaily) {
+  const d = comp.data || {};
+
+  const bundle = document.createElement('div');
+  bundle.className = 'roadbook-component daily-component';
+  bundle.setAttribute('data-component-type', 'daily');
+  bundle.setAttribute('data-component-id', comp.id);
+
+  // 仅第一个 daily 组件显示章节标题页（与后续每日页包在同一组件内，便于整段拖拽/删除）
+  if (isFirstDaily) {
+    const bgHtml = renderBgImageSlot(d.backgroundImage, 'backgroundImage');
+    const dlNumHtml = d.sectionNum ? `<span class="section-num-deco">${esc(d.sectionNum)}</span>` : '';
+    const dlKicker = renderComponentKicker('每日行程', 'DAILY ROUTE');
+    const titlePage = document.createElement('section');
+    titlePage.className = 'page-section chapter-title-page';
+    titlePage.innerHTML = `
+      ${bgHtml}
+      <div class="page-overlay"></div>
+      <div class="page-content" style="text-align:center;">
+        ${dlNumHtml}
+        ${dlKicker}
+        <h2 class="section-big-title" contenteditable="false" data-field="title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.title || '详细行程')}</h2>
+      </div>
+      <div class="bg-edit-ctrl-area"></div>`;
+    bundle.appendChild(titlePage);
+  }
+
+  // 内容页
+  const page = document.createElement('div');
+  page.className = 'daily-content-page';
+
+  // 左列顶部图片：固定 3 槽（JSON 不足时补空对象，保证默认三列拼图位）
+  const topImagesRaw = Array.isArray(d.topImages) ? d.topImages : [];
+  const topCandidates = [0, 1, 2].map((i) => {
+    const entry = topImagesRaw[i];
+    if (entry != null && typeof entry === 'object' && !Array.isArray(entry)) return entry;
+    return { alternates: [], slotLabel: '' };
+  });
+
+  const dayBadge = detectDayFromDate(d.date);
+  const dateDisplay = dayBadge ? stripDayPrefixFromDate(d.date) : String(d.date || '').trim();
+  const metaItems = [];
+  if (d.transport) metaItems.push(`交通：${d.transport}`);
+  if (d.accommodation) metaItems.push(`住宿：${d.accommodation}`);
+  if (d.meals) metaItems.push(`餐食：${d.meals}`);
+  if (d.distance) metaItems.push(`里程：${d.distance}`);
+  const metaHtml = metaItems.length
+    ? `<div class="daily-meta">${metaItems.map((m) => `<span class="daily-meta-item">${escMd(m)}</span>`).join('')}</div>`
+    : '';
+
+  // 标题栏
+  const titleBar = `<div class="daily-title-bar">
+      <div class="daily-label">Private Day Plan</div>
+      <div class="daily-head">
+        ${dayBadge ? `<span class="daily-day-badge">${esc(dayBadge)}</span>` : ''}
+      ${dateDisplay ? `<span class="daily-date">${escMd(dateDisplay)}</span>` : ''}
+      <span class="daily-theme" contenteditable="false" data-field="theme" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.theme || '')}</span>
+      </div>
+      ${metaHtml}
+    </div>`;
+
+  // 速览区（仅当 overview 字段存在时渲染）
+  const overviewHtml = (d.overview != null)
+    ? `<div class="daily-overview-wrap">
+        <div class="daily-overview-label">速览</div>
+        <div class="daily-overview-text" contenteditable="false" data-field="overview" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.overview || '')}</div>
+      </div>`
+    : '';
+
+  // 文字区
+  const textHtml = `<div class="daily-text" contenteditable="false" data-field="description" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.description || '')}</div>`;
+
+  // 右列图片：最少 2 格、最多 8 格，按 sideImage + bottomImages 顺序随内容延伸
+  const rightImagesForLayout = buildDailyRightSlotsForLayout(d);
+  const rightActual = rightImagesForLayout.length;
+
+  page.classList.add('daily-layout-classic');
+
+  const topDisplayLimit = decideTopDisplayLimit(topCandidates);
+  const topImagesForLayout = topCandidates.slice(0, topDisplayLimit || 3);
+  const topCountForLayout = Math.min(topImagesForLayout.length, 3);
+  let topGridClassForLayout = 'cols-1';
+  if (topCountForLayout === 2) topGridClassForLayout = 'cols-2';
+  else if (topCountForLayout >= 3) topGridClassForLayout = 'cols-3';
+
+  const topImgHtmlForLayout = `<div class="daily-top-images ${topGridClassForLayout}">${topImagesForLayout.map((img, i) =>
+        renderImage(img, '', `topImages/${i}`, '')
+      ).join('')}</div>`;
+
+  const rightGalleryClass = `daily-right-gallery daily-right-gallery--${rightActual}`;
+
+  const rightHtml = `<div class="daily-right-column ${rightGalleryClass} layout-classic">${rightImagesForLayout.map((r) =>
+        renderImage(r.entry, '', r.path, '')
+      ).join('')}</div>`;
+
+  // 组装页面（顶部图片与添加按钮同属 .daily-top-zone，便于悬浮定位）
+  const leftColumn = `<div class="daily-left-column">
+    <div class="daily-top-zone">
+      ${topImgHtmlForLayout}
+      <button type="button" class="daily-zone-add" data-zone="top">+ 添加上方图片</button>
+    </div>
+    ${titleBar}
+    ${overviewHtml}
+    ${textHtml}
+  </div>`;
+
+  const rightZone = rightHtml;
+  page.innerHTML = leftColumn + rightZone;
+  /* 编辑态顶部最多保留 3 张，与 decideTopDisplayLimit 的「初排展示」解耦 */
+  page.dataset.topMax = '3';
+  page.dataset.rightMax = '8';
+  const rightCol = page.querySelector('.daily-right-column');
+  if (rightCol) {
+    rightCol.insertAdjacentHTML('beforeend', '<button type="button" class="daily-zone-add" data-zone="right">+ 添加右侧图片</button>');
+  }
+  bundle.appendChild(page);
+  decorateDailyImageSlots(bundle);
+  syncDailyZoneClasses(bundle);
+  autoAdjustTopByNaturalSize(bundle);
+  container.appendChild(bundle);
+}
+
+function dailyWrapperActionsHtml() {
+  return `<div class="daily-img-actions">
+    <button type="button" class="daily-img-btn daily-drag-handle" draggable="true" title="拖动排序">⇅</button>
+    <button type="button" class="daily-img-btn daily-del" title="删除图片">×</button>
+  </div>`;
+}
+
+function decorateDailyImageSlots(bundle) {
+  if (!bundle) return;
+  const topWraps = Array.from(bundle.querySelectorAll('.daily-top-images .img-wrapper'));
+  topWraps.forEach((wrap) => {
+    wrap.dataset.dailyZone = 'top';
+    let actions = wrap.querySelector('.daily-img-actions');
+    if (!actions) {
+      wrap.insertAdjacentHTML('beforeend', dailyWrapperActionsHtml());
+    } else if (!actions.querySelector('.daily-drag-handle')) {
+      actions.insertAdjacentHTML('afterbegin', '<button type="button" class="daily-img-btn daily-drag-handle" draggable="true" title="拖动排序">⇅</button>');
+    }
+    wrap.querySelectorAll('img').forEach((img) => { img.draggable = false; });
+  });
+
+  const rightWraps = Array.from(bundle.querySelectorAll('.daily-right-column .img-wrapper'));
+  rightWraps.forEach((wrap) => {
+    wrap.dataset.dailyZone = 'right';
+    let actions = wrap.querySelector('.daily-img-actions');
+    if (!actions) {
+      wrap.insertAdjacentHTML('beforeend', dailyWrapperActionsHtml());
+    } else if (!actions.querySelector('.daily-drag-handle')) {
+      actions.insertAdjacentHTML('afterbegin', '<button type="button" class="daily-img-btn daily-drag-handle" draggable="true" title="拖动排序">⇅</button>');
+    }
+    wrap.querySelectorAll('img').forEach((img) => { img.draggable = false; });
+  });
+
+  const topZonePool = bundle.querySelector('.daily-top-images');
+  if (topZonePool) {
+    topZonePool.querySelectorAll(':scope > .img-wrapper').forEach((w) => {
+      syncEmptySlotAltsFromSiblings(w);
+    });
+  }
+  const rightColPool = bundle.querySelector('.daily-right-column');
+  if (rightColPool) {
+    rightColPool.querySelectorAll(':scope > .img-wrapper').forEach((w) => {
+      syncEmptySlotAltsFromSiblings(w);
+    });
+  }
+  refreshDailyDragUi(bundle);
+}
+
+/** 仅多图时显示排序手柄，避免单图界面杂乱 */
+function refreshDailyDragUi(bundle) {
+  if (!bundle) return;
+  const topZone = bundle.querySelector('.daily-top-images');
+  const topWraps = topZone ? Array.from(topZone.querySelectorAll(':scope > .img-wrapper')) : [];
+  topWraps.forEach((w) => {
+    const h = w.querySelector('.daily-drag-handle');
+    if (h) h.style.display = topWraps.length >= 2 ? '' : 'none';
+  });
+  const rightCol = bundle.querySelector('.daily-right-column');
+  const rightWraps = rightCol ? Array.from(rightCol.querySelectorAll(':scope > .img-wrapper')) : [];
+  rightWraps.forEach((w) => {
+    const h = w.querySelector('.daily-drag-handle');
+    if (h) h.style.display = rightWraps.length >= 2 ? '' : 'none';
+  });
+}
+
+function syncDailyZoneClasses(bundle) {
+  if (!bundle) return;
+  const page = bundle.querySelector('.daily-content-page');
+  if (!page) return;
+
+  const topZone = page.querySelector('.daily-top-images');
+  const topCount = topZone ? topZone.querySelectorAll('.img-wrapper').length : 0;
+  const topMax = Math.max(1, Number(page.dataset.topMax || 3));
+  if (topZone) {
+    const heroMode = String(page.dataset.topHero || '') === '1';
+    topZone.classList.remove('cols-1', 'cols-2', 'cols-2-hero', 'cols-3');
+    if (topCount >= 3) topZone.classList.add('cols-3');
+    else if (topCount === 2) topZone.classList.add(heroMode ? 'cols-2-hero' : 'cols-2');
+    else topZone.classList.add('cols-1');
+  }
+  const addTop = page.querySelector('.daily-zone-add[data-zone="top"]');
+  if (addTop) addTop.style.display = topCount >= topMax ? 'none' : '';
+
+  const rightCol = page.querySelector('.daily-right-column');
+  if (rightCol) {
+    const rightCount = rightCol.querySelectorAll('.img-wrapper').length;
+    const rightMax = Math.max(1, Math.min(8, Number(page.dataset.rightMax || 8)));
+    rightCol.classList.remove('right-count-1', 'right-count-2');
+    for (let n = 1; n <= 8; n++) rightCol.classList.remove(`daily-right-gallery--${n}`);
+    rightCol.classList.add('daily-right-gallery');
+    if (rightCount >= 1) rightCol.classList.add(`daily-right-gallery--${Math.min(rightCount, 8)}`);
+
+    if (rightCount === 0) page.classList.add('no-right-column');
+    else page.classList.remove('no-right-column');
+
+    const addRight = page.querySelector('.daily-zone-add[data-zone="right"]');
+    if (addRight) addRight.style.display = rightCount >= rightMax ? 'none' : '';
+  }
+
+  refreshDailyDragUi(bundle);
+}
+
+function reindexDailyImagePaths(bundle) {
+  if (!bundle) return;
+  const topWraps = Array.from(bundle.querySelectorAll('.daily-top-images .img-wrapper'));
+  topWraps.forEach((wrap, idx) => {
+    wrap.dataset.path = `topImages/${idx}`;
+    refreshSlotHint(wrap);
+  });
+
+  const rightWraps = Array.from(bundle.querySelectorAll('.daily-right-column .img-wrapper'));
+  rightWraps.forEach((wrap, idx) => {
+    wrap.dataset.path = idx === 0 ? 'sideImage' : `bottomImages/${idx - 1}`;
+    refreshSlotHint(wrap);
+  });
+
+  decorateDailyImageSlots(bundle);
+  syncDailyZoneClasses(bundle);
+  if (isEditing) ensureImgEditOverlays(bundle);
+}
+
+function autoAdjustTopByNaturalSize(bundle) {
+  if (!bundle) return;
+  const page = bundle.querySelector('.daily-content-page');
+  const topZone = bundle.querySelector('.daily-top-images');
+  if (!page || !topZone) return;
+
+  const wraps = Array.from(topZone.querySelectorAll('.img-wrapper'));
+  if (wraps.length < 3) return;
+
+  const imgs = wraps.map(w => w.querySelector('img')).filter(Boolean);
+  if (!imgs.length) return;
+
+  let checked = 0;
+  let hasLarge = false;
+  const done = () => {
+    checked += 1;
+    if (checked < imgs.length) return;
+    page.dataset.topHero = hasLarge ? '1' : '0';
+    reindexDailyImagePaths(bundle);
+  };
+
+  imgs.forEach((img) => {
+    const inspect = () => {
+      const w = Number(img.naturalWidth || 0);
+      const h = Number(img.naturalHeight || 0);
+      if (w > 0 && h > 0) {
+        const ratio = w / h;
+        if (ratio >= 1.85 || ratio <= 0.62 || w >= 2600 || h >= 2600) {
+          hasLarge = true;
+        }
+      }
+      done();
+    };
+    if (img.complete) inspect();
+    else {
+      img.addEventListener('load', inspect, { once: true });
+      img.addEventListener('error', done, { once: true });
+    }
+  });
+}
+
+const STAY_GALLERY_MAX = 8;
+
+function syncStayGalleryLayoutClass(gallery) {
+  if (!gallery) return;
+  const n = gallery.querySelectorAll(':scope > .img-wrapper').length;
+  for (let i = 1; i <= STAY_GALLERY_MAX; i++) gallery.classList.remove(`feature-hotel-gallery--${i}`);
+  const mod = n === 0 ? 1 : Math.min(n, STAY_GALLERY_MAX);
+  gallery.classList.add(`feature-hotel-gallery--${mod}`);
+}
+
+function decorateStayGallerySlots(gallery) {
+  if (!gallery) return;
+  const wraps = gallery.querySelectorAll(':scope > .img-wrapper');
+  wraps.forEach((wrap) => {
+    wrap.dataset.stayGalleryDnd = '1';
+    let actions = wrap.querySelector('.daily-img-actions');
+    if (!actions) {
+      wrap.insertAdjacentHTML('beforeend', dailyWrapperActionsHtml());
+    } else if (!actions.querySelector('.daily-drag-handle')) {
+      actions.insertAdjacentHTML('afterbegin', '<button type="button" class="daily-img-btn daily-drag-handle" draggable="true" title="拖动排序">⇅</button>');
+    }
+    wrap.querySelectorAll('img').forEach((img) => { img.draggable = false; });
+  });
+  gallery.querySelectorAll(':scope > .img-wrapper').forEach((w) => {
+    syncEmptySlotAltsFromSiblings(w);
+  });
+  const visual = gallery.closest('.feature-hotel-sheet-visual');
+  const addBtn = visual && visual.querySelector('.daily-zone-add[data-zone="stay-gallery"]');
+  const cnt = gallery.querySelectorAll(':scope > .img-wrapper').length;
+  if (addBtn) addBtn.style.display = cnt >= STAY_GALLERY_MAX ? 'none' : '';
+  wraps.forEach((w) => {
+    const h = w.querySelector('.daily-drag-handle');
+    if (h) h.style.display = cnt >= 2 ? '' : 'none';
+  });
+  // 住宿 / 交通（用车保障）共用右侧图库：动态插入的图片槽须有换图蒙层（仅编辑态）
+  if (isEditing) ensureImgEditOverlays(gallery);
+}
+
+function reindexStayGalleryItems(gallery, itemIndex) {
+  if (!gallery) return;
+  const wraps = Array.from(gallery.querySelectorAll(':scope > .img-wrapper'));
+  wraps.forEach((wrap, idx) => {
+    wrap.dataset.path = `items/${itemIndex}/images/${idx}`;
+    refreshSlotHint(wrap);
+  });
+  syncStayGalleryLayoutClass(gallery);
+  decorateStayGallerySlots(gallery);
+}
+
+/** 酒店卡右侧（住宿 / 交通）：插入「添加图片」、编排槽位与版式 class（与每日右栏一致，最多 8 张） */
+function initFeatureStayGalleries(featureSection) {
+  if (!featureSection || featureSection.dataset.componentType !== 'feature') return;
+  if (!featureSection.classList.contains('feature-hotel-sheet-section')) return;
+  const cards = featureSection.querySelectorAll('.feature-hotel-sheet');
+  cards.forEach((card, itemIndex) => {
+    const visual = card.querySelector('.feature-hotel-sheet-visual');
+    const gallery = visual && visual.querySelector('.feature-hotel-gallery');
+    if (!visual || !gallery) return;
+    if (!visual.querySelector('.daily-zone-add[data-zone="stay-gallery"]')) {
+      visual.insertAdjacentHTML('beforeend', '<button type="button" class="daily-zone-add" data-zone="stay-gallery">+ 添加右侧图片</button>');
+    }
+    reindexStayGalleryItems(gallery, itemIndex);
+  });
+}
+
+/** 住宿图库：最多 8 张，顺序与 items[i].images 一致；版式与每日行程右侧图库一致（--1 … --8） */
+function buildStayHotelGallery(imageEntries, title, itemIndex) {
+  const n = imageEntries.length;
+  const layoutMod = n === 0 ? 1 : Math.min(n, STAY_GALLERY_MAX);
+  const cells = n === 0
+    ? [renderImage('', title || '', `items/${itemIndex}/images/0`, 'feature-hotel-gcell')]
+    : imageEntries.slice(0, STAY_GALLERY_MAX).map((entry, idx) =>
+        renderImage(entry, title || '', `items/${itemIndex}/images/${idx}`, 'feature-hotel-gcell')
+      );
+  return `<div class="feature-hotel-gallery feature-hotel-gallery--${layoutMod}">${cells.join('')}</div>`;
+}
+
+/* ========== 特点介绍 ========== */
+function renderFeature(container, comp, idx) {
+  const d = comp.data || {};
+  const bgHtml = renderBgImageSlot(d.backgroundImage, 'backgroundImage');
+  const subtypeMeta = getSubtypeMeta(d.subtype || '其他');
+
+  const useHotelSheetLayout =
+    subtypeMeta.className === 'stay' || subtypeMeta.className === 'transport';
+  const section = document.createElement('div');
+  section.className =
+    `roadbook-component feature-section feature-${subtypeMeta.className}` +
+    (useHotelSheetLayout ? ' feature-hotel-sheet-section' : '');
+  section.setAttribute('data-component-type', 'feature');
+  section.setAttribute('data-component-id', comp.id);
+
+  // 头部
+  const ftNumHtml = d.sectionNum ? `<span class="section-num-deco">${esc(d.sectionNum)}</span>` : '';
+  const ftKicker = renderComponentKicker(subtypeMeta.label, subtypeMeta.eyebrow);
+  const header = `
+    <div class="feature-header">
+      ${bgHtml}
+      <div class="page-overlay"></div>
+      <div class="page-content" style="text-align:center;position:relative;z-index:2;">
+        ${ftNumHtml}
+        ${ftKicker}
+        <h2 class="section-big-title" contenteditable="false" data-field="title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.title || '特点介绍')}</h2>
+      </div>
+      <div class="bg-edit-ctrl-area"></div>
+    </div>`;
+
+  // 卡片内容（住宿、交通：酒店卡左文右图，最多 8 张）
+  const items = Array.isArray(d.items) ? d.items : [];
+  const cardsHtml = items.map((item, i) => {
+    const rawImages = Array.isArray(item.images) ? item.images : [];
+    const filtered = rawImages.filter(
+      entry => primaryImageUrl(entry) || (entry && typeof entry === 'object')
+    );
+    const imageEntries = useHotelSheetLayout
+      ? filtered.slice(0, STAY_GALLERY_MAX)
+      : filtered.slice(0, 3);
+    const imgCountClass = `img-count-${Math.min(imageEntries.length, 3)}`;
+    const textLen = String(item.description || '').replace(/\s+/g, '').length;
+    const balanceClass = useHotelSheetLayout
+      ? ''
+      : (textLen <= 55 ? 'balance-short' : (textLen >= 150 ? 'balance-long' : ''));
+    const bodyClass = imageEntries.length > 0
+      ? `feature-card-body ${useHotelSheetLayout ? 'feature-card-body-stay' : balanceClass}`.trim()
+      : `feature-card-body no-images${useHotelSheetLayout ? ' feature-card-body-stay' : ''}`.trim();
+    const mediaClass = useHotelSheetLayout
+      ? 'media-stay'
+      : (textLen <= 55 ? 'media-compact' : (textLen >= 150 ? 'media-relaxed' : ''));
+    if (useHotelSheetLayout) {
+      const galleryHtml = buildStayHotelGallery(imageEntries, item.title || '', i);
+      return `
+      <div class="feature-card feature-hotel-sheet">
+        <div class="feature-hotel-sheet-head">
+          <span class="feature-hotel-sheet-kicker">${escMd(subtypeMeta.label)}</span>
+          <div class="feature-hotel-sheet-title" contenteditable="false" data-field="items/${i}/title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.title || '')}</div>
+        </div>
+        <div class="feature-hotel-sheet-rule"></div>
+        <div class="feature-hotel-sheet-body">
+          <div class="feature-hotel-sheet-copy">
+            <div class="feature-hotel-intro-row"><span class="feature-hotel-intro-label">简介</span></div>
+            <div class="feature-hotel-sheet-desc" contenteditable="false" data-field="items/${i}/description" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.description || '')}</div>
+          </div>
+          <div class="feature-hotel-sheet-visual">
+            ${galleryHtml}
+          </div>
+        </div>
+      </div>`;
+    }
+    const imagesHtml = imageEntries.length > 0
+      ? `<div class="feature-card-images ${imgCountClass} ${mediaClass}">${imageEntries.map((entry, imgIdx) =>
+          renderImage(entry, item.title || '', `items/${i}/images/${imgIdx}`, '')
+        ).join('')}</div>`
+      : '';
+    return `
+      <div class="feature-card">
+        <div class="feature-card-title-wrap">
+          <span class="feature-type-pill">${escMd(subtypeMeta.eyebrow)}</span>
+          <div class="feature-card-title" contenteditable="false" data-field="items/${i}/title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.title || '')}</div>
+        </div>
+        <div class="${bodyClass}">
+          <div class="feature-card-text" contenteditable="false" data-field="items/${i}/description" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(item.description || '')}</div>
+          ${imagesHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  section.innerHTML = `${header}<div class="feature-cards${useHotelSheetLayout ? ' feature-cards-stay' : ''}">${cardsHtml}</div>`;
+  container.appendChild(section);
+  if (useHotelSheetLayout) initFeatureStayGalleries(section);
+}
+
+/* ========== 文字说明 ========== */
+function renderTextBlock(container, comp, idx) {
+  const d = comp.data || {};
+  const subtypeMeta = getSubtypeMeta(d.subtype || '其他');
+  const sub = d.subtype || '';
+  const mergedRich = isTextblockMergedRichSubtype(sub);
+  const bgHtml = mergedRich ? '' : renderBgImageSlot(d.backgroundImage, 'backgroundImage');
+
+  let bodyInner = '';
+  let emptyHint = '';
+
+  if (mergedRich) {
+    const mergedRaw = buildSimpleRichEditorInnerHtml(d);
+    const mergedSafe = mergedRaw ? sanitizeRoadbookRichHtml(mergedRaw) : '';
+    const editorInner = mergedSafe || '<p></p>';
+    bodyInner = `<div class="textblock-rich textblock-content textblock-rich-editor" contenteditable="false" data-field="content" data-rich="1" data-component-id="${esc(comp.id)}">${editorInner}</div>`;
+    emptyHint = '';
+  } else {
+    const sections = Array.isArray(d.sections) ? d.sections : [];
+    const sectionsHtml = sections.length ? `
+    <div class="textblock-sections">
+      ${sections.map((sec, i) => `
+    <div class="textblock-section-item">
+      <h3 contenteditable="false" data-field="sections/${i}/heading" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(sec.heading || '')}</h3>
+      <div class="tb-body" contenteditable="false" data-field="sections/${i}/body" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(sec.body || '')}</div>
+    </div>`).join('')}
+    </div>
+  ` : '';
+    const contentHtml = d.content
+      ? `<div class="textblock-content" contenteditable="false" data-field="content" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.content)}</div>`
+      : '';
+    bodyInner = `${contentHtml}${sectionsHtml}`;
+    emptyHint = (!contentHtml && !sectionsHtml)
+      ? `<div class="textblock-empty">请人工填写费用、规则或出行说明内容</div>`
+      : '';
+  }
+
+  const section = document.createElement('section');
+  section.setAttribute('data-component-type', 'text-block');
+  section.setAttribute('data-component-id', comp.id);
+
+  if (mergedRich) {
+    const tbTitle =
+      sub === '须知'
+        ? subtypeMeta.label
+        : (d.title && String(d.title).trim()) || subtypeMeta.label || '标题';
+    section.className = `textblock-section textblock-simple-rich roadbook-component textblock-${subtypeMeta.className}`;
+    section.setAttribute('data-textblock-mode', 'simple-rich');
+    section.innerHTML = `
+    <div class="textblock-card">
+      <h2 class="textblock-title" contenteditable="false" data-field="title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(tbTitle)}</h2>
+      <div class="textblock-body-panel">
+        <div class="textblock-body-content">
+          ${bodyInner}
+          ${emptyHint}
+        </div>
+      </div>
+    </div>`;
+  } else {
+    section.className = `textblock-section page-section-with-bg roadbook-component textblock-${subtypeMeta.className}`;
+    section.innerHTML = `
+    ${bgHtml}
+    <div class="page-overlay" style="background:linear-gradient(180deg,rgba(26,35,50,0.08) 0%,rgba(26,35,50,0.22) 100%);"></div>
+    <div class="textblock-card">
+      <h2 class="textblock-title" contenteditable="false" data-field="title" data-component-id="${esc(comp.id)}" data-copy-md="1">${escMd(d.title || '标题')}</h2>
+      <div class="textblock-body-panel">
+        <div class="textblock-body-content">
+          ${bodyInner}
+          ${emptyHint}
+        </div>
+      </div>
+    </div>
+    <div class="bg-edit-ctrl-area"></div>`;
+  }
+
+  container.appendChild(section);
+}
+
+/* ========== 初始化 ========== */
+document.addEventListener('DOMContentLoaded', function() {
+  renderAll();
+  hydrateTitleBackgrounds();
+  hydrateBgCtrlAreas();
+  document.querySelectorAll('.roadbook-component[data-component-type="feature"].feature-hotel-sheet-section').forEach(initFeatureStayGalleries);
+});
+
+// ===== 编辑模式 =====
+let isEditing = false;
+let dailyDndSrc = null;
+let stayGalleryDndSrc = null;
+
+function dailyInsertDraggedRelative(container, dragged, target, clientX, clientY) {
+  if (!container || !dragged || !target || dragged === target) return;
+  const sibs = Array.from(container.children).filter((el) => el.classList && el.classList.contains('img-wrapper'));
+  if (!sibs.includes(dragged) || !sibs.includes(target)) return;
+
+  const r = target.getBoundingClientRect();
+  const horiz = r.width >= r.height;
+  const before = horiz ? clientX < r.left + r.width / 2 : clientY < r.top + r.height / 2;
+
+  const others = sibs.filter((n) => n !== dragged);
+  let destIndex = others.indexOf(target) + (before ? 0 : 1);
+  if (destIndex < 0) destIndex = 0;
+  if (destIndex > others.length) destIndex = others.length;
+
+  const ref = others[destIndex];
+  if (ref) {
+    container.insertBefore(dragged, ref);
+  } else {
+    const addBtn = container.querySelector(':scope > .daily-zone-add');
+    container.insertBefore(dragged, addBtn || null);
+  }
+}
+
+document.addEventListener('dragstart', function(e) {
+  if (!isEditing) return;
+  const handle = e.target.closest('.daily-drag-handle');
+  if (!handle) return;
+  const wrap = handle.closest('.img-wrapper');
+  if (wrap && wrap.dataset.stayGalleryDnd === '1') {
+    stayGalleryDndSrc = wrap;
+    wrap.classList.add('daily-dnd-source');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', 'stay-gallery');
+    try {
+      e.dataTransfer.setDragImage(wrap, Math.min(48, wrap.offsetWidth / 2), Math.min(36, wrap.offsetHeight / 2));
+    } catch (err) { /* ignore */ }
+    e.stopPropagation();
+    return;
+  }
+  if (!wrap || !wrap.dataset.dailyZone) return;
+  dailyDndSrc = wrap;
+  wrap.classList.add('daily-dnd-source');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', wrap.dataset.dailyZone);
+  try {
+    e.dataTransfer.setDragImage(wrap, Math.min(48, wrap.offsetWidth / 2), Math.min(36, wrap.offsetHeight / 2));
+  } catch (err) { /* ignore */ }
+  e.stopPropagation();
+});
+
+document.addEventListener('dragover', function(e) {
+  if (stayGalleryDndSrc && isEditing) {
+    if (e.target.closest('.daily-zone-add, .daily-img-actions')) return;
+    const wrap = e.target.closest('.feature-hotel-gallery .img-wrapper');
+    if (!wrap || wrap === stayGalleryDndSrc) return;
+    if (wrap.closest('.feature-hotel-gallery') !== stayGalleryDndSrc.closest('.feature-hotel-gallery')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.img-wrapper.daily-dnd-over').forEach((el) => el.classList.remove('daily-dnd-over'));
+    wrap.classList.add('daily-dnd-over');
+    return;
+  }
+  if (!dailyDndSrc || !isEditing) return;
+  if (e.target.closest('.daily-zone-add, .daily-img-actions')) return;
+  const wrap = e.target.closest('.daily-top-images .img-wrapper, .daily-right-column .img-wrapper');
+  if (!wrap || wrap === dailyDndSrc) return;
+  if (wrap.dataset.dailyZone !== dailyDndSrc.dataset.dailyZone) return;
+  const topHost = dailyDndSrc.closest('.daily-top-images');
+  const rightHost = dailyDndSrc.closest('.daily-right-column');
+  if (topHost && wrap.closest('.daily-top-images') !== topHost) return;
+  if (rightHost && wrap.closest('.daily-right-column') !== rightHost) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.img-wrapper.daily-dnd-over').forEach((el) => el.classList.remove('daily-dnd-over'));
+  wrap.classList.add('daily-dnd-over');
+});
+
+document.addEventListener('drop', function(e) {
+  if (stayGalleryDndSrc && isEditing) {
+    const wrap = e.target.closest('.feature-hotel-gallery .img-wrapper');
+    if (!wrap || wrap.dataset.stayGalleryDnd !== '1') return;
+    if (wrap.closest('.feature-hotel-gallery') !== stayGalleryDndSrc.closest('.feature-hotel-gallery')) return;
+    e.preventDefault();
+    const container = stayGalleryDndSrc.parentElement;
+    if (!container || container !== wrap.parentElement) return;
+    dailyInsertDraggedRelative(container, stayGalleryDndSrc, wrap, e.clientX, e.clientY);
+    e.stopPropagation();
+    const gallery = stayGalleryDndSrc.closest('.feature-hotel-gallery');
+    const featureSec = gallery.closest('.roadbook-component[data-component-type="feature"]');
+    const card = gallery.closest('.feature-hotel-sheet');
+    const itemIndex = Array.from(featureSec.querySelectorAll('.feature-hotel-sheet')).indexOf(card);
+    reindexStayGalleryItems(gallery, itemIndex);
+    return;
+  }
+  if (!dailyDndSrc || !isEditing) return;
+  const wrap = e.target.closest('.daily-top-images .img-wrapper, .daily-right-column .img-wrapper');
+  if (!wrap || wrap.dataset.dailyZone !== dailyDndSrc.dataset.dailyZone) return;
+  e.preventDefault();
+  const container = dailyDndSrc.parentElement;
+  if (!container || container !== wrap.parentElement) return;
+  dailyInsertDraggedRelative(container, dailyDndSrc, wrap, e.clientX, e.clientY);
+  e.stopPropagation();
+  const bundle = dailyDndSrc.closest('.roadbook-component.daily-component');
+  reindexDailyImagePaths(bundle);
+});
+
+document.addEventListener('dragend', function() {
+  if (stayGalleryDndSrc) {
+    stayGalleryDndSrc.classList.remove('daily-dnd-source');
+    stayGalleryDndSrc = null;
+  }
+  if (dailyDndSrc) {
+    dailyDndSrc.classList.remove('daily-dnd-source');
+    dailyDndSrc = null;
+  }
+  document.querySelectorAll('.img-wrapper.daily-dnd-over').forEach((el) => el.classList.remove('daily-dnd-over'));
+});
+
+document.addEventListener('click', function(e) {
+  if (!isEditing) return;
+  const altBtn = e.target.closest('.img-alt-btn');
+  if (!altBtn) return;
+  e.stopPropagation();
+  e.preventDefault();
+  let alts = [];
+  try {
+    alts = JSON.parse(altBtn.dataset.alts || '[]');
+  } catch (err) { alts = []; }
+  const wrapper = altBtn.closest('.img-wrapper');
+  const targetImg = wrapper && (wrapper.querySelector('img.page-bg') || wrapper.querySelector('img.cover-logo') || wrapper.querySelector('img'));
+  showAltPanel(targetImg, alts.length ? alts : [], altBtn);
+});
+
+document.addEventListener('click', function(e) {
+  if (!isEditing) return;
+
+  const addBtn = e.target.closest('.highlights-item-add');
+  if (addBtn) {
+    const section = addBtn.closest('.roadbook-component[data-component-type="highlights"]');
+    if (!section) return;
+    const list = section.querySelector('.highlights-items');
+    if (!list) return;
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="highlights-item-text" contenteditable="true">请填写亮点内容</span><button type="button" class="hl-item-del" title="删除此条">×</button>`;
+    list.appendChild(li);
+    reindexHighlightItems(section);
+    const textEl = li.querySelector('.highlights-item-text');
+    if (textEl) {
+      textEl.focus();
+      document.execCommand && document.execCommand('selectAll', false, null);
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
+  const delBtn = e.target.closest('.hl-item-del');
+  if (delBtn) {
+    const li = delBtn.closest('li');
+    const section = delBtn.closest('.roadbook-component[data-component-type="highlights"]');
+    if (li && section) {
+      const list = section.querySelector('.highlights-items');
+      if (list && list.children.length > 1) {
+        li.remove();
+      } else if (li) {
+        const textEl = li.querySelector('.highlights-item-text');
+        if (textEl) textEl.textContent = '';
+      }
+      reindexHighlightItems(section);
+    }
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!isEditing) return;
+
+  const addBtn = e.target.closest('.daily-zone-add');
+  if (addBtn) {
+    const zone = addBtn.dataset.zone;
+    if (zone === 'stay-gallery') {
+      const visual = addBtn.closest('.feature-hotel-sheet-visual');
+      const featureSec = addBtn.closest('.roadbook-component[data-component-type="feature"]');
+      const gallery = visual && visual.querySelector('.feature-hotel-gallery');
+      const card = visual && visual.closest('.feature-hotel-sheet');
+      if (!gallery || !featureSec || !card) return;
+      const itemIndex = Array.from(featureSec.querySelectorAll('.feature-hotel-sheet')).indexOf(card);
+      const count = gallery.querySelectorAll(':scope > .img-wrapper').length;
+      if (count >= STAY_GALLERY_MAX) return;
+      gallery.insertAdjacentHTML('afterbegin', renderImage('', '', `items/${itemIndex}/images/${count}`, 'feature-hotel-gcell'));
+      reindexStayGalleryItems(gallery, itemIndex);
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    const bundle = addBtn.closest('.roadbook-component.daily-component');
+    if (!bundle) return;
+
+    if (zone === 'top') {
+      let topZone = bundle.querySelector('.daily-top-images');
+      if (!topZone) {
+        topZone = document.createElement('div');
+        topZone.className = 'daily-top-images cols-1';
+        addBtn.parentElement.insertBefore(topZone, addBtn);
+      }
+      const count = topZone.querySelectorAll('.img-wrapper').length;
+      const page = bundle.querySelector('.daily-content-page');
+      const topMax = Math.max(1, Number((page && page.dataset.topMax) || 3));
+      if (count >= topMax) return;
+      topZone.insertAdjacentHTML('beforeend', renderImage('', '', `topImages/${count}`, ''));
+    } else if (zone === 'right') {
+      const rightCol = bundle.querySelector('.daily-right-column');
+      if (!rightCol) return;
+      const page = bundle.querySelector('.daily-content-page');
+      const rightMax = Math.max(1, Math.min(8, Number((page && page.dataset.rightMax) || 8)));
+      const count = rightCol.querySelectorAll('.img-wrapper').length;
+      if (count >= rightMax) return;
+      const path = count === 0 ? 'sideImage' : `bottomImages/${count - 1}`;
+      rightCol.insertAdjacentHTML('afterbegin', renderImage('', '', path, ''));
+    }
+
+    reindexDailyImagePaths(bundle);
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
+  const delBtn = e.target.closest('.daily-img-btn.daily-del');
+  if (delBtn) {
+    const wrap = delBtn.closest('.img-wrapper');
+    if (wrap && wrap.dataset.stayGalleryDnd === '1') {
+      const gallery = wrap.closest('.feature-hotel-gallery');
+      const featureSec = wrap.closest('.roadbook-component[data-component-type="feature"]');
+      const card = wrap.closest('.feature-hotel-sheet');
+      if (!gallery || !featureSec || !card) return;
+      const itemIndex = Array.from(featureSec.querySelectorAll('.feature-hotel-sheet')).indexOf(card);
+      const count = gallery.querySelectorAll(':scope > .img-wrapper').length;
+      if (count > 1) wrap.remove();
+      else {
+        const img = wrap.querySelector('img');
+        if (img) img.remove();
+        wrap.dataset.alts = '[]';
+      }
+      reindexStayGalleryItems(gallery, itemIndex);
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    const bundle = delBtn.closest('.roadbook-component.daily-component');
+    if (!wrap || !bundle) return;
+
+    const zone = wrap.dataset.dailyZone;
+    if (zone === 'top') {
+      const topZone = bundle.querySelector('.daily-top-images');
+      const count = topZone ? topZone.querySelectorAll('.img-wrapper').length : 0;
+      if (count > 1) wrap.remove();
+      else {
+        const img = wrap.querySelector('img');
+        if (img) img.remove();
+        wrap.dataset.alts = '[]';
+      }
+    } else {
+      const rightCol = bundle.querySelector('.daily-right-column');
+      const count = rightCol ? rightCol.querySelectorAll('.img-wrapper').length : 0;
+      if (count > 1) wrap.remove();
+      else {
+        const img = wrap.querySelector('img');
+        if (img) img.remove();
+        wrap.dataset.alts = '[]';
+      }
+    }
+
+    reindexDailyImagePaths(bundle);
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
+
+function exitEditMode() {
+  if (!isEditing) return;
+  isEditing = false;
+  document.body.classList.remove('editing');
+  const btn = document.querySelector('.btn-edit');
+  if (btn) {
+    btn.textContent = '编辑';
+    btn.classList.remove('active');
+  }
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = 'false';
+  });
+  dailyDndSrc = null;
+  document.querySelectorAll('.img-wrapper.daily-dnd-source, .img-wrapper.daily-dnd-over').forEach((el) => {
+    el.classList.remove('daily-dnd-source', 'daily-dnd-over');
+  });
+}
+
+function toggleEdit() {
+  if (isEditing) {
+    exitEditMode();
+    return;
+  }
+  isEditing = true;
+  document.body.classList.add('editing');
+  const btn = document.querySelector('.btn-edit');
+  btn.textContent = '退出编辑';
+  btn.classList.add('active');
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = 'true';
+  });
+  initEditUI();
+}
+
+function getWrapperAlts(wrapper) {
+  if (!wrapper) return [];
+  try {
+    return uniqueUrls(JSON.parse(wrapper.dataset.alts || '[]'));
+  } catch (e) {
+    return [];
+  }
+}
+
+/** 从 `.bg-edit-ctrl-area` 上溯到标题区内的 `.page-bg-wrap` 或封面背景；费用/服务说明页无此控件。 */
+function findBgWrapForCtrl(ctrl) {
+  const parent = ctrl && ctrl.parentElement;
+  if (!parent) return null;
+  return parent.querySelector(':scope > .page-bg-wrap')
+    || parent.querySelector(':scope > .img-wrapper[data-path="/cover/backgroundImage"]')
+    || parent.querySelector('.page-bg-wrap')
+    || parent.querySelector('.img-wrapper[data-path="/cover/backgroundImage"]');
+}
+
+function refreshBgCtrlForWrapper(wrapper) {
+  const isTitleBg = wrapper && (
+    wrapper.classList.contains('page-bg-wrap') ||
+    wrapper.dataset.path === '/cover/backgroundImage'
+  );
+  if (!isTitleBg) return;
+  const parent = wrapper.parentElement;
+  if (!parent) return;
+  const ctrl = parent.querySelector(':scope > .bg-edit-ctrl-area') || parent.querySelector('.bg-edit-ctrl-area');
+  if (ctrl) updateBgCtrlArea(ctrl, wrapper);
+}
+
+function updateBgCtrlArea(ctrl, bgWrap) {
+  ctrl.innerHTML = '';
+  if (!bgWrap) return;
+
+  const replBtn = document.createElement('button');
+  replBtn.type = 'button';
+  replBtn.className = 'bg-edit-btn';
+  replBtn.textContent = '🖼 替换背景';
+  replBtn.addEventListener('click', (e) => { e.stopPropagation(); openImageModal(bgWrap); });
+  ctrl.appendChild(replBtn);
+
+  const alts = getWrapperAlts(bgWrap);
+  if (alts.length >= 1) {
+    const altBtn = document.createElement('button');
+    altBtn.type = 'button';
+    altBtn.className = 'bg-edit-btn';
+    altBtn.textContent = alts.length > 1 ? `备选 ${alts.length}张` : '备选';
+    altBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const img = bgWrap.querySelector('img.page-bg') || bgWrap.querySelector('img');
+      showAltPanel(img, alts, null, bgWrap);
+    });
+    ctrl.appendChild(altBtn);
+  }
+}
+
+function hydrateBgCtrlAreas() {
+  document.querySelectorAll('.bg-edit-ctrl-area').forEach(ctrl => {
+    const bgWrap = findBgWrapForCtrl(ctrl);
+    if (!bgWrap) return;
+    updateBgCtrlArea(ctrl, bgWrap);
+  });
+}
+
+/** 为缺少蒙层的 img-wrapper 补全「点击替换图片」（动态插入槽位时需单独调用）。root 不传则遍历整页。 */
+function ensureImgEditOverlays(rootEl) {
+  const root = rootEl || document;
+  root.querySelectorAll('.img-wrapper').forEach(wrap => {
+    if (wrap.classList.contains('page-bg-wrap')) return;
+    if (!wrap.querySelector('.img-edit-overlay')) {
+      const overlay = document.createElement('div');
+      overlay.className = 'img-edit-overlay';
+      const hint = wrap.dataset.slotHint || compositeSlotHint(wrap.dataset.path || '', wrap.dataset.slotLabel || '');
+      overlay.innerHTML = `<span class="slot-path">${esc(hint)}</span><span>点击替换图片</span>`;
+      overlay.addEventListener('click', () => openImageModal(wrap));
+      wrap.appendChild(overlay);
+    }
+  });
+}
+
+function getComponentRootFromWrapper(wrap) {
+  if (!wrap) return null;
+  return wrap.querySelector(':scope > .roadbook-component[data-component-id]');
+}
+
+function buildInsertBetween(insertBeforeSection) {
+  const div = document.createElement('div');
+  div.className = 'insert-between';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'insert-btn';
+  btn.title = '在此处插入组件';
+  btn.textContent = '+';
+  btn.addEventListener('click', () => {
+    showAddComponentPanel(insertBeforeSection);
+  });
+  div.appendChild(btn);
+  return div;
+}
+
+function initEditUI() {
+  // 给每个 img-wrapper 添加编辑蒙层（通栏章节背景 .page-bg-wrap 除外：蒙层铺满会像灰幕盖住图；换图用右下角「替换背景」）
+  ensureImgEditOverlays();
+
+  getComponentWrappers(document.getElementById('components-container')).forEach((wrap) => {
+    const sec = getComponentRootFromWrapper(wrap);
+    if (!sec || sec.querySelector('.drag-handle')) return;
+    const handle = document.createElement('div');
+    handle.className = 'drag-handle';
+    handle.innerHTML = '⋮⋮';
+    handle.addEventListener('mousedown', () => { sec.draggable = true; });
+    sec.appendChild(handle);
+
+    const actions = document.createElement('div');
+    actions.className = 'component-actions';
+    actions.innerHTML = '<button class="comp-btn comp-btn-delete" title="删除组件">×</button>';
+    actions.querySelector('.comp-btn-delete').addEventListener('click', () => {
+      deleteComponent(sec);
+    });
+    sec.appendChild(actions);
+  });
+
+  // 填充大标题区块背景浮动控制区（费用/服务说明页不包含 bg-edit-ctrl-area）
+  hydrateBgCtrlAreas();
+
+  // 在组件之间添加插入按钮
+  addInsertButtons();
+  initDragDrop();
+
+  document.querySelectorAll('.roadbook-component.daily-component').forEach((bundle) => {
+    decorateDailyImageSlots(bundle);
+  });
+  document.querySelectorAll('.roadbook-component[data-component-type="feature"].feature-hotel-sheet-section').forEach(initFeatureStayGalleries);
+}
+
+// ===== 图片替换 =====
+let currentImageWrapper = null;
+
+function openImageModal(wrapper) {
+  if (!wrapper) return;
+  if (!document.body.classList.contains('editing')) return;
+  currentImageWrapper = wrapper;
+  const modal = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  const curLabel = wrapper.dataset.slotLabel || '';
+  content.innerHTML = `
+    <div style="position:relative">
+      <h3 class="modal-title">替换图片</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="img-modal-actions">
+      <label style="display:block;margin-bottom:6px;font-size:13px;color:#555;">图片 URL</label>
+      <input type="text" id="img-url-input" placeholder="输入图片URL..." />
+      <label style="display:block;margin-top:14px;margin-bottom:6px;font-size:13px;color:#555;">地点标注（可选，写入 JSON 的 slotLabel）</label>
+      <input type="text" id="img-slot-label-input" placeholder="如：肇兴侗寨 · 堂安梯田" value="${esc(curLabel)}" />
+      <button class="btn-url" onclick="applyImageUrl()">确认</button>
+      <button class="btn-upload" onclick="triggerUpload()">从本地上传</button>
+      <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleFileUpload(event)" />
+    </div>
+  `;
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+function applyImageUrl() {
+  const url = document.getElementById('img-url-input').value.trim();
+  const slotEl = document.getElementById('img-slot-label-input');
+  const slotLabel = slotEl ? slotEl.value.trim() : '';
+  if (currentImageWrapper) {
+    if (slotLabel) currentImageWrapper.dataset.slotLabel = slotLabel;
+    else delete currentImageWrapper.dataset.slotLabel;
+    refreshSlotHint(currentImageWrapper);
+    if (url) applyImage(currentImageWrapper, url);
+  }
+  closeModal();
+}
+
+function triggerUpload() {
+  document.getElementById('img-file-input').click();
+}
+
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    if (currentImageWrapper) {
+      const slotEl = document.getElementById('img-slot-label-input');
+      const slotLabel = slotEl ? slotEl.value.trim() : '';
+      if (slotLabel) currentImageWrapper.dataset.slotLabel = slotLabel;
+      else delete currentImageWrapper.dataset.slotLabel;
+      refreshSlotHint(currentImageWrapper);
+      applyImage(currentImageWrapper, ev.target.result);
+    }
+    closeModal();
+  };
+  reader.readAsDataURL(file);
+}
+
+function refreshAltButton(wrapper, alts) {
+  const list = Array.isArray(alts) ? alts.filter(Boolean) : [];
+  if (isTitleBackgroundWrapper(wrapper)) {
+    wrapper.querySelectorAll('.img-alt-btn').forEach(b => b.remove());
+    return;
+  }
+  const dupAlts = wrapper.querySelectorAll('.img-alt-btn');
+  if (dupAlts.length > 1) {
+    for (let i = 1; i < dupAlts.length; i++) dupAlts[i].remove();
+  }
+  let btn = wrapper.querySelector('.img-alt-btn');
+  if (list.length < 1) {
+    if (btn) btn.remove();
+    return;
+  }
+  const label = list.length > 1 ? `备选 ${list.length}张` : '备选';
+  const payload = esc(JSON.stringify(list));
+  if (!btn) {
+    wrapper.insertAdjacentHTML('beforeend',
+      `<button type="button" class="img-alt-btn" data-alts="${payload}">${label}</button>`);
+  } else {
+    btn.textContent = label;
+    btn.dataset.alts = JSON.stringify(list);
+  }
+}
+
+function mergeAltsAfterReplace(wrapper, newSrc) {
+  let alts = [];
+  try {
+    alts = wrapper.dataset.alts ? JSON.parse(wrapper.dataset.alts) : [];
+  } catch (e) { alts = []; }
+  if (!alts.length) {
+    alts = [newSrc];
+  } else if (!alts.includes(newSrc)) {
+    alts = [newSrc, ...alts];
+  } else {
+    alts = [newSrc, ...alts.filter(u => u !== newSrc)];
+  }
+  wrapper.dataset.alts = JSON.stringify(alts);
+  refreshAltButton(wrapper, alts);
+  refreshSlotHint(wrapper);
+  refreshBgCtrlForWrapper(wrapper);
+}
+
+function applyImage(wrapper, src) {
+  mergeAltsAfterReplace(wrapper, src);
+  const isTitleBg = isTitleBackgroundWrapper(wrapper);
+  if (isTitleBg) {
+    applyTitleBackground(wrapper, src);
+    return;
+  }
+  let img = wrapper.querySelector('img.page-bg') || wrapper.querySelector('img.cover-logo') || wrapper.querySelector('img');
+  if (img) {
+    img.src = src;
+    return;
+  }
+  const placeholder = wrapper.querySelector('.img-placeholder, .cover-img-placeholder, .page-bg-placeholder');
+  if (placeholder) placeholder.remove();
+  img = document.createElement('img');
+  img.src = src;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  if (wrapper.classList.contains('page-bg-wrap')) {
+    img.className = 'page-bg';
+    img.alt = '';
+  } else if (wrapper.classList.contains('cover-logo-wrap')) {
+    img.className = 'cover-logo';
+    img.alt = 'Logo';
+  } else {
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;';
+  }
+  wrapper.insertBefore(img, wrapper.firstChild);
+}
+
+/* ========== 备选图片面板（对齐 roadbook v1） ========== */
+function showAltPanel(targetImg, alts, altBtn, wrapOverride) {
+  const overlay = document.createElement('div');
+  overlay.className = 'alt-panel-overlay';
+  overlay.innerHTML = `
+    <div class="alt-panel">
+      <div class="alt-panel-title">
+        <span>选择备选图片</span>
+        <button type="button" class="alt-panel-close">&times;</button>
+      </div>
+      <div class="alt-panel-grid">
+        ${alts.map(url => `<img src="${esc(url)}" alt="">`).join('')}
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <button type="button" class="alt-local-btn">从本地选择图片</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('.alt-panel-close').onclick = () => overlay.remove();
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+  overlay.querySelectorAll('.alt-panel-grid img').forEach((gridImg, i) => {
+    gridImg.onclick = () => {
+      const url = alts[i];
+      const wrap = wrapOverride || (altBtn ? altBtn.closest('.img-wrapper') : (targetImg && targetImg.closest('.img-wrapper')));
+      if (wrap && url) applyImage(wrap, url);
+      overlay.remove();
+    };
+  });
+
+  overlay.querySelector('.alt-local-btn').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wrap = wrapOverride || (altBtn ? altBtn.closest('.img-wrapper') : (targetImg && targetImg.closest('.img-wrapper')));
+        if (wrap) applyImage(wrap, e.target.result);
+        overlay.remove();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+}
+
+// ===== 组件增删 =====
+function showAddComponentPanel(insertBeforeSection) {
+  const modal = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  const beforeId = insertBeforeSection ? insertBeforeSection.dataset.componentId : null;
+  const existingTypes = new Set(Array.from(document.querySelectorAll('#components-container > .roadbook-component')).map(el => el.dataset.componentType));
+  const pickerHtml = Object.entries(COMPONENT_TYPES).map(([type, meta]) => {
+    const disabled = meta.allowMultiple === false && existingTypes.has(type);
+    const action = meta.subtypes
+      ? `showSubtypePicker('${type}', ${beforeId ? `'${beforeId}'` : 'null'})`
+      : `addComponent('${type}', null, ${beforeId ? `'${beforeId}'` : 'null'})`;
+    return `<div class="picker-item ${disabled ? 'disabled' : ''}" ${disabled ? '' : `onclick="${action}"`}>
+      <div class="picker-item-icon">${esc(meta.icon || '')}</div>
+      <div class="picker-item-name">${escMd(meta.name)}</div>
+      <div class="picker-item-desc">${escMd(meta.description || '')}</div>
+      ${disabled ? '<div class="picker-item-note">已存在</div>' : ''}
+    </div>`;
+  }).join('');
+  content.innerHTML = `
+    <div style="position:relative">
+      <h3 class="modal-title">添加组件</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="component-picker">
+      ${pickerHtml}
+    </div>
+  `;
+  modal.classList.add('active');
+}
+
+function showSubtypePicker(type, insertBeforeId) {
+  const meta = COMPONENT_TYPES[type] || {};
+  const subtypes = meta.subtypes || ['其他'];
+
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <div style="position:relative">
+      <h3 class="modal-title">选择${esc(meta.name || '组件')}类型</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="component-picker">
+      ${subtypes.map(sub => {
+        const subMeta = getSubtypeMeta(sub);
+        return `
+        <div class="picker-item" onclick="addComponent('${type}', '${sub}', ${insertBeforeId ? `'${insertBeforeId}'` : 'null'})">
+          <div class="picker-item-icon">${escMd(subMeta.eyebrow)}</div>
+          <div class="picker-item-name">${escMd(sub)}</div>
+          <div class="picker-item-desc">${escMd(subMeta.label)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function addComponent(type, subtype, insertBeforeId) {
+  closeModal();
+  const id = `${type}-${Date.now()}`;
+  const comp = createEmptyComponent(type, id, subtype);
+
+  const container = document.getElementById('components-container');
+  const tempContainer = document.createElement('div');
+  const beforeSec = insertBeforeId
+    ? container.querySelector(`[data-component-id="${insertBeforeId}"]`)
+    : null;
+  const beforeWrap = beforeSec ? beforeSec.closest('.roadbook-component-wrapper') : null;
+  const hasDaily = !!container.querySelector('.daily-component');
+  const isFirstDaily = comp.type === 'daily' && !hasDaily;
+
+  renderComponent(tempContainer, comp, tripData.components.length, isFirstDaily);
+
+  while (tempContainer.firstChild) {
+    if (beforeWrap) {
+      container.insertBefore(tempContainer.firstChild, beforeWrap);
+    } else {
+      container.appendChild(tempContainer.firstChild);
+    }
+  }
+
+  initEditUI();
+  hydrateBgCtrlAreas();
+}
+
+function createEmptyComponent(type, id, subtype) {
+  const subMeta = getSubtypeMeta(subtype || '其他');
+  const st = subtype || '其他';
+  if (type === 'text-block' && isTextblockMergedRichSubtype(st)) {
+    return {
+      type: 'text-block',
+      id,
+      data: {
+        backgroundImage: '',
+        title: subMeta.label,
+        subtype: st,
+        content: st === '费用'
+          ? '<p>请在此编辑<strong>费用说明</strong>（整段自由输入；需要条目时可在编辑时插入列表）。</p>'
+          : '<p>请在此编辑服务说明。</p>'
+      }
+    };
+  }
+  const templates = {
+    highlights: { type: 'highlights', id, data: { backgroundImage: '', title: '行程亮点', content: '请填写本次定制行程的核心价值。', items: ['请填写亮点一', '请填写亮点二', '请填写亮点三'] } },
+    itinerary: { type: 'itinerary', id, data: { backgroundImage: '', title: '行程概览', style: 'table', items: [{ day: 1, date: '', time: '', title: '', locations: '', transport: '', distance: '', accommodation: '', meals: '' }] } },
+    daily: { type: 'daily', id, data: { backgroundImage: '', title: '详细行程', date: 'Day X', theme: '请填写当天主题', description: '请填写行程介绍...', topImages: [], sideImage: '', bottomImages: [] } },
+    feature: { type: 'feature', id, data: { backgroundImage: '', title: subtype ? `${subMeta.label}` : '特点介绍', subtype: subtype || '其他', items: [{ title: '请填写标题', description: '请填写介绍内容...', images: [{ url: '', slotLabel: `${subtype || '特点'}配图 1` }] }] } },
+    'text-block': { type: 'text-block', id, data: { backgroundImage: '', title: st !== '其他' ? subMeta.label : '文字说明', subtype: st, sections: [{ heading: '请填写小标题', body: '请填写内容...' }] } }
+  };
+  return templates[type] || templates['text-block'];
+}
+
+function deleteComponent(section) {
+  const type = section.dataset.componentType;
+  const typeName = COMPONENT_TYPES[type]?.name || type;
+  if (confirm(`确定删除「${typeName}」模块？此操作不可撤销。`)) {
+    const wrap = section.closest('.roadbook-component-wrapper');
+    if (wrap) {
+      const prev = wrap.previousElementSibling;
+      if (prev && prev.classList.contains('insert-between')) {
+        prev.remove();
+      }
+      wrap.remove();
+    } else {
+      const prev = section.previousElementSibling;
+      if (prev && prev.classList.contains('insert-between')) {
+        prev.remove();
+      }
+      section.remove();
+    }
+  }
+}
+
+// ===== 插入按钮 =====
+function addInsertButtons() {
+  document.querySelectorAll('#components-container > .insert-between').forEach((el) => el.remove());
+
+  const container = document.getElementById('components-container');
+  const wrappers = getComponentWrappers(container);
+
+  wrappers.forEach((wrap, i) => {
+    if (i === 0) return;
+    const sec = getComponentRootFromWrapper(wrap);
+    if (!sec) return;
+    container.insertBefore(buildInsertBetween(sec), wrap);
+  });
+}
+
+// ===== 拖拽排序 =====
+let draggedSection = null;
+let draggedWrapper = null;
+
+function initDragDrop() {
+  const container = document.getElementById('components-container');
+  getComponentWrappers(container).forEach((wrap) => {
+    const sec = getComponentRootFromWrapper(wrap);
+    if (!sec) return;
+    sec.addEventListener('dragstart', onDragStart);
+    sec.addEventListener('dragover', onDragOver);
+    sec.addEventListener('dragleave', onDragLeave);
+    sec.addEventListener('drop', onDrop);
+    sec.addEventListener('dragend', onDragEnd);
+  });
+}
+
+function onDragStart(e) {
+  if (e.target.closest('.daily-drag-handle')) return;
+  draggedSection = e.currentTarget;
+  draggedWrapper = draggedSection.closest('.roadbook-component-wrapper');
+  if (draggedWrapper) draggedWrapper.classList.add('dragging');
+  else draggedSection.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', draggedSection.dataset.componentId);
+}
+
+function onDragOver(e) {
+  if (dailyDndSrc) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const target = e.currentTarget;
+  if (target === draggedSection) return;
+
+  const rect = target.getBoundingClientRect();
+  const midY = rect.top + rect.height / 2;
+
+  document.querySelectorAll('.drag-above, .drag-below').forEach(el => {
+    el.classList.remove('drag-above', 'drag-below');
+  });
+
+  if (e.clientY < midY) {
+    target.classList.add('drag-above');
+  } else {
+    target.classList.add('drag-below');
+  }
+}
+
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-above', 'drag-below');
+}
+
+function onDrop(e) {
+  if (dailyDndSrc) return;
+  e.preventDefault();
+  const target = e.currentTarget;
+  if (target === draggedSection || !draggedSection || !draggedWrapper) return;
+
+  const targetWrap = target.closest('.roadbook-component-wrapper');
+  if (!targetWrap || targetWrap === draggedWrapper) return;
+
+  const container = document.getElementById('components-container');
+  const rect = target.getBoundingClientRect();
+  const midY = rect.top + rect.height / 2;
+
+  if (e.clientY < midY) {
+    container.insertBefore(draggedWrapper, targetWrap);
+  } else {
+    let next = targetWrap.nextElementSibling;
+    while (next && next.classList.contains('insert-between')) {
+      next = next.nextElementSibling;
+    }
+    if (next) container.insertBefore(draggedWrapper, next);
+    else container.appendChild(draggedWrapper);
+  }
+
+  clearDragStyles();
+  addInsertButtons();
+}
+
+function onDragEnd(e) {
+  e.currentTarget.draggable = false;
+  clearDragStyles();
+}
+
+function clearDragStyles() {
+  if (draggedWrapper) {
+    draggedWrapper.classList.remove('dragging');
+    draggedWrapper = null;
+  }
+  if (draggedSection) {
+    draggedSection.classList.remove('dragging');
+    draggedSection = null;
+  }
+  document.querySelectorAll('.drag-above, .drag-below').forEach(el => {
+    el.classList.remove('drag-above', 'drag-below');
+  });
+}
+
+// ===== 数据收集与保存 =====
+function setByPath(obj, pathStr, value) {
+  const segs = pathStr.split('/').filter(Boolean);
+  let cur = obj;
+  for (let i = 0; i < segs.length - 1; i++) {
+    const key = isNaN(segs[i]) ? segs[i] : parseInt(segs[i]);
+    if (cur[key] == null) {
+      cur[key] = isNaN(segs[i + 1]) ? {} : [];
+    }
+    cur = cur[key];
+  }
+  const lastKey = isNaN(segs[segs.length - 1]) ? segs[segs.length - 1] : parseInt(segs[segs.length - 1]);
+  cur[lastKey] = value;
+}
+
+function normalizePersistedImageUrl(url) {
+  let s = resolveExportMediaUrl(String(url || '').trim());
+  if (!s || s.includes('placehold')) return '';
+  if (/^file:\/\//i.test(s)) return '';
+  return s;
+}
+
+
+function packImageValue(urlsOrdered, slotLabel) {
+  const sl = (slotLabel || '').trim();
+  const uniq = urlsOrdered.map(normalizePersistedImageUrl).filter(Boolean);
+  if (!sl) {
+    if (!uniq.length) return '';
+    if (uniq.length === 1) return uniq[0];
+    return uniq;
+  }
+  if (!uniq.length) return { url: '', slotLabel: sl };
+  if (uniq.length === 1) return { url: uniq[0], slotLabel: sl };
+  return { alternates: uniq, slotLabel: sl };
+}
+
+function buildImageValueFromWrapper(wrap) {
+  let alts = [];
+  try {
+    alts = wrap.dataset.alts ? JSON.parse(wrap.dataset.alts) : [];
+  } catch (e) { alts = []; }
+  const img = wrap.querySelector('img.page-bg') || wrap.querySelector('img.cover-logo') || wrap.querySelector('img');
+  let current = '';
+  if (img && img.src && !img.src.includes('placehold')) current = normalizePersistedImageUrl(img.src);
+
+  const slotLabel = (wrap.dataset.slotLabel || '').trim();
+  alts = alts.map(normalizePersistedImageUrl).filter(Boolean);
+
+  if (!alts.length) return packImageValue([current], slotLabel);
+
+  const rest = alts.filter(u => u !== current);
+  const ordered = [current, ...rest].filter(Boolean);
+  const uniq = [...new Set(ordered)];
+  return packImageValue(uniq, slotLabel);
+}
+
+function escapeCssAttr(value) {
+  return typeof CSS !== 'undefined' && CSS.escape
+    ? CSS.escape(String(value))
+    : String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+/** 逻辑组件外包一层 .roadbook-component-wrapper，非 #components-container 直接子节点 */
+function getComponentWrappers(container) {
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(':scope > .roadbook-component-wrapper'));
+}
+
+function countRenderedComponents(container) {
+  return getComponentWrappers(container).length;
+}
+
+function collectComponentIdOrder(container) {
+  const idOrder = [];
+  const seenId = new Set();
+  getComponentWrappers(container).forEach((wrap) => {
+    const root = wrap.querySelector('.roadbook-component[data-component-id]');
+    const id = root?.dataset?.componentId;
+    if (id && !seenId.has(id)) {
+      seenId.add(id);
+      idOrder.push(id);
+    }
+  });
+  return idOrder;
+}
+
+function getComponentSections(container, cid) {
+  const sel = `.roadbook-component[data-component-id="${escapeCssAttr(cid)}"]`;
+  const wrap = getComponentWrappers(container).find((w) => w.querySelector(sel));
+  return wrap ? Array.from(wrap.querySelectorAll(sel)) : [];
+}
+
+function collectData() {
+  const data = {
+    meta: { ...tripData.meta, updatedAt: new Date().toISOString() },
+    cover: tripData.cover ? { ...tripData.cover } : {},
+    components: []
+  };
+
+  const coverSec = document.querySelector('.cover-section');
+  if (coverSec) {
+    coverSec.querySelectorAll('.img-wrapper[data-path]').forEach(wrap => {
+      const p = wrap.dataset.path;
+      const val = buildImageValueFromWrapper(wrap);
+      if (p === '/cover/backgroundImage') data.cover.backgroundImage = val;
+      if (p === '/cover/logo') data.cover.logo = val;
+    });
+    const titleEl = coverSec.querySelector('[data-field="title"]');
+    const subtitleEl = coverSec.querySelector('[data-field="subtitle"]');
+    data.cover.title = titleEl
+      ? (titleEl.dataset.copyMd === '1' ? htmlInlineToMarkdownBold(titleEl).trim() : titleEl.textContent.trim())
+      : '';
+    let sub = subtitleEl
+      ? (subtitleEl.dataset.copyMd === '1' ? htmlInlineToMarkdownBold(subtitleEl).trim() : subtitleEl.textContent.trim())
+      : '';
+    if (shouldOmitCoverSubtitle(sub)) sub = '';
+    data.cover.subtitle = sub;
+  }
+
+  const container = document.getElementById('components-container');
+  const idOrder = collectComponentIdOrder(container);
+
+  idOrder.forEach(cid => {
+    const secs = getComponentSections(container, cid);
+    if (!secs.length) return;
+    const origComp = tripData.components.find(c => c.id === cid);
+    const comp = {
+      type: secs[0].dataset.componentType,
+      id: cid,
+      data: origComp && origComp.data ? JSON.parse(JSON.stringify(origComp.data)) : {}
+    };
+
+    secs.forEach(sec => {
+      sec.querySelectorAll('[data-field]').forEach(el => {
+        const field = el.dataset.field;
+        if (!field) return;
+        const val = el.dataset.rich === '1'
+          ? el.innerHTML.trim()
+          : el.dataset.copyMd === '1'
+            ? htmlInlineToMarkdownBold(el).trim()
+            : el.textContent.trim();
+        setByPath(comp.data, field, val);
+      });
+      sec.querySelectorAll('.img-wrapper[data-path]').forEach(wrap => {
+        const path = wrap.dataset.path;
+        if (!path || path.startsWith('/cover')) return;
+        const val = buildImageValueFromWrapper(wrap);
+        if (path && val !== undefined && val !== '') {
+          setByPath(comp.data, path, val);
+        }
+      });
+    });
+
+    if (comp.type === 'text-block' && isTextblockMergedRichSubtype(comp.data.subtype)) {
+      const host = secs[0];
+      if (host) {
+        const rich = host.querySelector('.textblock-rich-editor[data-field="content"]')
+          || host.querySelector('.textblock-rich[data-field="content"]');
+        comp.data.content = rich ? rich.innerHTML.trim() : '';
+        delete comp.data.lines;
+        delete comp.data.sections;
+      }
+    }
+
+    if (comp.type === 'highlights') {
+      const host = secs[0];
+      const itemTexts = Array.from(host.querySelectorAll('.highlights-item-text'))
+        .map(el => htmlInlineToMarkdownBold(el).trim())
+        .filter(Boolean);
+      comp.data.items = itemTexts;
+      const contentEl = host.querySelector('.highlights-content');
+      comp.data.content = contentEl ? htmlInlineToMarkdownBold(contentEl).trim() : '';
+    }
+
+    if (comp.type === 'daily') {
+      const host = secs[0];
+      const topWraps = Array.from(host.querySelectorAll('.daily-top-images .img-wrapper'));
+      const rightWraps = Array.from(host.querySelectorAll('.daily-right-column .img-wrapper'));
+
+      const topValues = topWraps
+        .map(wrap => buildImageValueFromWrapper(wrap))
+        .filter(val => val !== '' && val !== undefined && val !== null);
+
+      const rightValues = rightWraps
+        .map(wrap => buildImageValueFromWrapper(wrap))
+        .filter(val => val !== '' && val !== undefined && val !== null);
+
+      comp.data.topImages = topValues.slice(0, 3);
+      comp.data.sideImage = rightValues[0] || '';
+      comp.data.bottomImages = rightValues.slice(1, 8);
+    }
+
+    if (comp.type === 'feature' && Array.isArray(comp.data.items)) {
+      const host = secs[0];
+      const cards = host.querySelectorAll('.feature-hotel-sheet');
+      if (cards.length) {
+        cards.forEach((card, idx) => {
+          const gallery = card.querySelector('.feature-hotel-gallery');
+          if (!gallery || !comp.data.items[idx]) return;
+          const wraps = Array.from(gallery.querySelectorAll(':scope > .img-wrapper'));
+          const vals = wraps
+            .map(w => buildImageValueFromWrapper(w))
+            .filter(v => v !== '' && v !== undefined && v !== null);
+          comp.data.items[idx].images = vals.slice(0, STAY_GALLERY_MAX);
+        });
+      }
+    }
+
+    data.components.push(comp);
+  });
+
+  if (idOrder.length === 0 && Array.isArray(tripData.components) && tripData.components.length > 0) {
+    data.components = JSON.parse(JSON.stringify(tripData.components));
+  }
+
+  return data;
+}
+
+function saveData() {
+  const container = document.getElementById('components-container');
+  const domComponentCount = countRenderedComponents(container);
+  if (domComponentCount === 0) {
+    const memCount = Array.isArray(tripData.components) ? tripData.components.length : 0;
+    if (memCount > 0) {
+      alert('行程章节未显示在页面上，已取消保存，避免清空 tripData。请刷新页面（F5）确认路书完整后再保存。');
+    } else {
+      alert('当前没有任何行程章节，无法保存。请刷新页面；若仍只有封面，说明 tripData.json 已被清空，需先恢复数据。');
+    }
+    return;
+  }
+  const data = collectData();
+  const json = JSON.stringify(data, null, 2);
+
+  fetch('/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: json
+  }).then(res => {
+    if (res.ok) {
+      exitEditMode();
+      alert('保存成功！');
+    } else {
+      throw new Error('Server save failed');
+    }
+  }).catch(() => {
+    // 降级为下载
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'tripData.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    exitEditMode();
+    alert('已下载 tripData.json（未连接预览服务）。');
+  });
+}
+
+const ROADBOOK_EXPORT_WIDTH_PX = 1200;
+
+const EXPORT_CAPTURE_NEUTRALIZE_CSS = `
+  *, *::before, *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .page-bg-wrap .page-bg, img { filter: none !important; }
+  .page-overlay {
+    background: linear-gradient(180deg, rgba(26,35,50,0.18) 0%, rgba(26,35,50,0.32) 100%) !important;
+  }
+  .highlights-card { background: rgba(255, 255, 255, 0.97) !important; }
+`;
+
+const EXPORT_CAPTURE_LAYOUT_CSS = `
+  body.exporting .roadbook-container,
+  body.exporting #cover-container,
+  body.exporting #cover-container .cover-section,
+  body.exporting #components-container,
+  body.exporting #components-container > .roadbook-component-wrapper {
+    width: ${ROADBOOK_EXPORT_WIDTH_PX}px !important;
+    max-width: ${ROADBOOK_EXPORT_WIDTH_PX}px !important;
+    min-width: ${ROADBOOK_EXPORT_WIDTH_PX}px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  body.exporting .page-section,
+  body.exporting .daily-content-page,
+  body.exporting .cover-section {
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  body.exporting .cover-section {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+  }
+  body.exporting .cover-left > .img-wrapper.cover-bg {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 480px !important;
+    aspect-ratio: 4 / 5 !important;
+  }
+`;
+
+function injectExportCaptureStyles(doc) {
+  const d = doc || document;
+  let style = d.getElementById('roadbook-export-capture-style');
+  if (!style) {
+    style = d.createElement('style');
+    style.id = 'roadbook-export-capture-style';
+    d.head.appendChild(style);
+  }
+  style.textContent = `${EXPORT_CAPTURE_NEUTRALIZE_CSS}\n${EXPORT_CAPTURE_LAYOUT_CSS}`;
+}
+
+function rewriteExportMediaUrlsInTree(root) {
+  const scope = root || document;
+  scope.querySelectorAll('img[src]').forEach((img) => {
+    const raw = img.currentSrc || img.getAttribute('src') || '';
+    const resolved = resolveExportMediaUrl(raw);
+    if (!resolved || resolved === raw) return;
+    if (!img.dataset.roadbookOrigSrc) img.dataset.roadbookOrigSrc = raw;
+    img.src = resolved;
+    img.setAttribute('crossorigin', 'anonymous');
+    img.setAttribute('referrerpolicy', 'no-referrer');
+  });
+  scope.querySelectorAll('[style*="background-image"]').forEach((el) => {
+    const bg = el.style.getPropertyValue('background-image') || el.style.backgroundImage || '';
+    const m = bg.match(/url\(\s*['"]?([^'")]+)['"]?\s*\)/i);
+    if (!m) return;
+    const resolved = resolveExportMediaUrl(m[1]);
+    if (!resolved || resolved === m[1]) return;
+    if (!el.dataset.roadbookOrigBg) el.dataset.roadbookOrigBg = bg;
+    el.style.setProperty('background-image', cssBgUrlValue(resolved), 'important');
+  });
+}
+
+function rewriteUnembeddedRemoteImagesToProxy(root) {
+  const scope = root || document;
+  scope.querySelectorAll('img[src]').forEach((img) => {
+    if (img.dataset.roadbookInlineSrc) return;
+    const raw = img.currentSrc || img.getAttribute('src') || '';
+    const proxied = proxyExportMediaUrl(resolveExportMediaUrl(raw));
+    if (!proxied || proxied === raw) return;
+    if (!img.dataset.roadbookOrigSrc) img.dataset.roadbookOrigSrc = raw;
+    img.src = proxied;
+    img.setAttribute('crossorigin', 'anonymous');
+    img.setAttribute('referrerpolicy', 'no-referrer');
+  });
+  scope.querySelectorAll('[style*="background-image"]').forEach((el) => {
+    const bg = el.style.getPropertyValue('background-image') || el.style.backgroundImage || '';
+    const m = bg.match(/url\(\s*['"]?([^'")]+)['"]?\s*\)/i);
+    if (!m || m[1].startsWith('data:')) return;
+    const proxied = proxyExportMediaUrl(resolveExportMediaUrl(m[1]));
+    if (!proxied || proxied === m[1]) return;
+    if (!el.dataset.roadbookOrigBg) el.dataset.roadbookOrigBg = bg;
+    el.style.setProperty('background-image', cssBgUrlValue(proxied), 'important');
+  });
+}
+
+function restoreExportMediaUrlsInTree(root) {
+  const scope = root || document;
+  scope.querySelectorAll('img[data-roadbook-orig-src]').forEach((img) => {
+    if (img.dataset.roadbookInlineSrc) return;
+    img.src = img.dataset.roadbookOrigSrc;
+    delete img.dataset.roadbookOrigSrc;
+  });
+  scope.querySelectorAll('[data-roadbook-orig-bg]').forEach((el) => {
+    el.style.backgroundImage = el.dataset.roadbookOrigBg;
+    delete el.dataset.roadbookOrigBg;
+  });
+}
+
+async function embedImagesAsDataUrls(root) {
+  const scope = root || document;
+  const imgs = Array.from(scope.querySelectorAll('img[src]'));
+  await Promise.all(imgs.map(async (img) => {
+    const raw = img.currentSrc || img.getAttribute('src') || '';
+    const src = resolveExportMediaUrl(raw);
+    if (src !== raw) img.src = src;
+    if (!src || src.startsWith('data:') || src.startsWith('blob:') || img.dataset.roadbookInlineSrc) return;
+    let fetchUrl = src;
+    try {
+      fetchUrl = new URL(src, document.baseURI || window.location.href).href;
+    } catch (_) { /* keep src */ }
+    try {
+      const res = await fetch(fetchUrl, { credentials: 'same-origin' });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      if (!img.dataset.roadbookOrigSrc) img.dataset.roadbookOrigSrc = raw;
+      img.dataset.roadbookInlineSrc = '1';
+      img.src = String(dataUrl);
+    } catch (_) { /* 保留已归一化的 src */ }
+  }));
+  scope.querySelectorAll('[style*="background-image"]').forEach((el) => {
+    const bg = el.style.getPropertyValue('background-image') || el.style.backgroundImage || '';
+    const m = bg.match(/url\(\s*['"]?([^'")]+)['"]?\s*\)/i);
+    if (!m || m[1].startsWith('data:')) return;
+    const resolved = resolveExportMediaUrl(m[1]);
+    if (!resolved || resolved === m[1]) return;
+    if (!el.dataset.roadbookOrigBg) el.dataset.roadbookOrigBg = bg;
+    el.style.setProperty('background-image', cssBgUrlValue(resolved), 'important');
+  });
+}
+
+function waitForImagesDecoded(root) {
+  const imgs = Array.from((root || document).querySelectorAll('img[src]'));
+  return Promise.all(imgs.map((img) => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    if (typeof img.decode === 'function') {
+      return img.decode().catch(() => undefined);
+    }
+    return new Promise((resolve) => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    });
+  }));
+}
+
+function restoreEmbeddedImages(root) {
+  (root || document).querySelectorAll('img[data-roadbook-inline-src]').forEach((img) => {
+    if (img.dataset.roadbookOrigSrc) img.src = img.dataset.roadbookOrigSrc;
+    delete img.dataset.roadbookOrigSrc;
+    delete img.dataset.roadbookInlineSrc;
+  });
+}
+
+/** PDF 分片：#cover-container > .cover-section，#components-container > .roadbook-component-wrapper */
+function getRoadbookPdfSliceElements() {
+  const slices = [];
+  const coverContainer = document.getElementById('cover-container');
+  if (coverContainer) {
+    coverContainer.querySelectorAll(':scope > .cover-section').forEach((el) => slices.push(el));
+  }
+  const componentsContainer = document.getElementById('components-container');
+  if (componentsContainer) {
+    componentsContainer.querySelectorAll(':scope > .roadbook-component-wrapper').forEach((el) => slices.push(el));
+  }
+  return slices;
+}
+
+function normalizeCanvasToExportWidth(canvas, targetWidth, bgColor) {
+  const w = Math.max(1, canvas.width);
+  const targetW = Math.max(1, targetWidth);
+  if (w === targetW) return canvas;
+  const targetH = Math.max(1, Math.round(canvas.height * targetW / w));
+  const out = document.createElement('canvas');
+  out.width = targetW;
+  out.height = targetH;
+  const ctx = out.getContext('2d');
+  if (!ctx) return canvas;
+  ctx.fillStyle = bgColor || '#ffffff';
+  ctx.fillRect(0, 0, targetW, targetH);
+  ctx.drawImage(canvas, 0, 0, w, canvas.height, 0, 0, targetW, targetH);
+  return out;
+}
+
+function stitchCanvasSlices(slices, bgColor) {
+  const outW = Math.max(1, ...slices.map((s) => s.width));
+  let outH = 0;
+  slices.forEach((s) => { outH += s.height; });
+  const out = document.createElement('canvas');
+  out.width = outW;
+  out.height = outH;
+  const ctx = out.getContext('2d');
+  if (!ctx) throw new Error('无法创建拼接画布');
+  ctx.fillStyle = bgColor || '#ffffff';
+  ctx.fillRect(0, 0, outW, outH);
+  let dy = 0;
+  slices.forEach((s) => {
+    const x = Math.floor((outW - s.width) / 2);
+    ctx.drawImage(s, 0, 0, s.width, s.height, x, dy, s.width, s.height);
+    dy += s.height;
+  });
+  return out;
+}
+
+/**
+ * 按 DOM 分片逐块 html2canvas，归一化到 1200px 宽后纵向拼成一张长图 canvas。
+ */
+async function captureAndStitchRoadbookCanvas(options = {}) {
+  const bg = options.backgroundColor
+    || getComputedStyle(document.body).backgroundColor
+    || '#f7f8fa';
+  const scale = options.scale ?? Math.min(2, window.devicePixelRatio || 2);
+  const windowWidth = ROADBOOK_EXPORT_WIDTH_PX;
+  const slices = getRoadbookPdfSliceElements();
+  if (!slices.length) throw new Error('未找到可导出的封面或行程分片');
+
+  injectExportCaptureStyles(document);
+  const blockCanvases = [];
+
+  for (let i = 0; i < slices.length; i++) {
+    const el = slices[i];
+    try {
+      el.scrollIntoView({ block: 'start', behavior: 'instant' });
+    } catch (_) {
+      el.scrollIntoView(true);
+    }
+    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    const raw = await html2canvas(el, {
+      scale,
+      backgroundColor: bg,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      windowWidth,
+      windowHeight: window.innerHeight,
+      onclone: (clonedDoc) => {
+        clonedDoc.body.classList.add('exporting');
+        injectExportCaptureStyles(clonedDoc);
+        rewriteUnembeddedRemoteImagesToProxy(clonedDoc);
+      }
+    });
+    const normalized = normalizeCanvasToExportWidth(raw, ROADBOOK_EXPORT_WIDTH_PX, bg);
+    blockCanvases.push(normalized);
+    console.info(`[roadbook] capture block ${i + 1}/${slices.length}:`, {
+      raw: `${raw.width}x${raw.height}`,
+      normalized: `${normalized.width}x${normalized.height}`
+    });
+  }
+
+  const merged = stitchCanvasSlices(blockCanvases, bg);
+  console.info('[roadbook] stitched canvas:', {
+    width: merged.width,
+    height: merged.height,
+    blocks: blockCanvases.length
+  });
+  return merged;
+}
+
+/**
+ * 打印 / 另存为 PDF 前：取消 lazy、触发视口内加载，并等待网络完成。
+ * 否则大量 <img loading="lazy"> 在未滚动到的区域不会加载，PDF 会大面积缺图。
+ */
+async function ensureAllImagesReadyForPrint(root) {
+  const scope = root || document;
+  const imgs = Array.from(scope.querySelectorAll('img[src]'));
+  imgs.forEach((img) => {
+    img.loading = 'eager';
+    img.removeAttribute('loading');
+    img.decoding = 'sync';
+  });
+  // 兜底：滚到底再回顶，促使曾处于懒加载队列的图片开始请求
+  try {
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    await new Promise((r) => requestAnimationFrame(r));
+    await new Promise((r) => setTimeout(r, 120));
+    window.scrollTo(0, 0);
+  } catch (_) { /* ignore */ }
+  if (document.fonts && document.fonts.ready) {
+    try { await document.fonts.ready; } catch (_) { /* ignore */ }
+  }
+  await Promise.all(
+    imgs.map((img) => {
+      if (img.complete) return Promise.resolve();
+      return new Promise((resolve) => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    })
+  );
+}
+function getDefaultRoadbookExportOptions(overrides = {}) {
+  const bg = getComputedStyle(document.body).backgroundColor;
+  return {
+    scale: Math.min(2, window.devicePixelRatio || 2),
+    backgroundColor: (bg && bg !== 'rgba(0, 0, 0, 0)') ? bg : '#f7f8fa',
+    ...overrides
+  };
+}
+
+function getRoadbookPdfFilename() {
+  const title = (tripData && tripData.meta && tripData.meta.title) || document.title || '路书';
+  const safe = String(title).replace(/[\\/:*?"<>|]/g, '_').trim() || '路书';
+  return `${safe}.pdf`;
+}
+
+function getRoadbookPngFilename() {
+  const title = (tripData && tripData.meta && tripData.meta.title) || document.title || '路书';
+  const safe = String(title).replace(/[\\/:*?"<>|]/g, '_').trim() || '路书';
+  return safe.endsWith('.png') ? safe : `${safe}.png`;
+}
+
+async function prepareRoadbookExport(root) {
+  const scope = root || document.querySelector('.roadbook-container') || document.body;
+  await ensureAllImagesReadyForPrint(scope);
+  rewriteExportMediaUrlsInTree(scope);
+  await embedImagesAsDataUrls(scope);
+  if (document.fonts && document.fonts.ready) {
+    try { await document.fonts.ready; } catch (_) { /* ignore */ }
+  }
+  injectExportCaptureStyles(document);
+}
+
+/** 与 PDF 共用：预加载 → 分块截图 → 拼接长图（exporting 样式由调用方加 body.exporting） */
+async function buildRoadbookStitchedExportCanvas(options = {}) {
+  const root = document.querySelector('.roadbook-container') || document.body;
+  const opts = getDefaultRoadbookExportOptions(options);
+  await prepareRoadbookExport(root);
+  rewriteUnembeddedRemoteImagesToProxy(root);
+  await waitForImagesDecoded(root);
+  try {
+    return await captureAndStitchRoadbookCanvas(opts);
+  } finally {
+    restoreEmbeddedImages(root);
+    restoreExportMediaUrlsInTree(root);
+  }
+}
+
+function downloadStitchedCanvasAsPng(canvas, filename) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('生成图片失败'));
+        return;
+      }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename || getRoadbookPngFilename();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      resolve();
+    }, 'image/png');
+  });
+}
+
+/**
+ * 将拼接后的长图 canvas 整页写入 PDF（单页，页尺寸=长图尺寸，不做 A4 切分）。
+ */
+function exportMergedCanvasToPdf(mergedCanvas, options = {}) {
+  const { jsPDF } = window.jspdf;
+  const imageQuality = options.imageQuality ?? 0.96;
+  const pageWidth = Math.max(1, mergedCanvas.width);
+  const pageHeight = Math.max(1, mergedCanvas.height);
+
+  console.info('[roadbook] exportPdfFromStitched:', {
+    canvasWidth: pageWidth,
+    canvasHeight: pageHeight,
+    singlePage: true
+  });
+
+  const pdf = new jsPDF({
+    orientation: 'p',
+    unit: 'px',
+    format: [pageWidth, pageHeight],
+    compress: true
+  });
+
+  pdf.addImage(
+    mergedCanvas.toDataURL('image/jpeg', imageQuality),
+    'JPEG',
+    0,
+    0,
+    pageWidth,
+    pageHeight
+  );
+
+  pdf.save(options.filename || getRoadbookPdfFilename());
+  return pdf;
+}
+
+/** 分块截图 → 拼成长图 → 再导出 PDF */
+async function exportRoadbookToPdf(options = {}) {
+  const merged = await buildRoadbookStitchedExportCanvas(options);
+  return exportMergedCanvasToPdf(merged, options);
+}
+
+async function exportRoadbookImage() {
+  const root = document.querySelector('.roadbook-container');
+  if (!root) return;
+  if (typeof html2canvas !== 'function') {
+    alert('未加载 html2canvas，请联网后重试。');
+    return;
+  }
+
+  const btn = document.querySelector('.toolbar .btn-image');
+  const prevLabel = btn ? btn.textContent : '';
+  const prevEditing = document.body.classList.contains('editing');
+  if (prevEditing) document.body.classList.remove('editing');
+
+  document.body.classList.add('exporting');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '导出中...';
+  }
+
+  try {
+    const canvas = await buildRoadbookStitchedExportCanvas(getDefaultRoadbookExportOptions());
+    await downloadStitchedCanvasAsPng(canvas, getRoadbookPngFilename());
+  } catch (e) {
+    console.error('[roadbook] exportRoadbookImage:', e);
+    alert('导出图片失败：' + (e && e.message ? e.message : String(e)));
+  } finally {
+    document.body.classList.remove('exporting');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = prevLabel || '导出图片';
+    }
+    if (prevEditing) document.body.classList.add('editing');
+  }
+}
+
+async function exportPDF() {
+  if (typeof html2canvas !== 'function' || !window.jspdf) {
+    alert('导出依赖还没加载成功，请确认当前浏览器可以访问 CDN 后刷新页面。');
+    return;
+  }
+
+  const btn = document.querySelector('.toolbar .btn-export');
+  const prevLabel = btn ? btn.textContent : '';
+  const prevEditing = document.body.classList.contains('editing');
+  if (prevEditing) document.body.classList.remove('editing');
+
+  document.body.classList.add('exporting');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '导出中...';
+  }
+
+  try {
+    await exportRoadbookToPdf();
+  } catch (e) {
+    console.error('[roadbook] exportPDF:', e);
+    alert('导出 PDF 失败：' + (e && e.message ? e.message : String(e)));
+  } finally {
+    document.body.classList.remove('exporting');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = prevLabel || '导出PDF';
+    }
+    if (prevEditing) document.body.classList.add('editing');
+  }
+}
+</script>
+</body>
+</html>

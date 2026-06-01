@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skills-travel-planner — 开源 AI 路书生成工具 | Roadbook Generator for AI Agents</title>
+  <meta name="description" content="开源 AI 路书生成工具：面向 Cursor / Claude Agent 的定制游行路书 Skill。简版行程表 → tripData.json → 可交付 HTML/PDF，含小红书配图、LLM 润色、飞猪酒店数据。Open-source AI travel roadbook generator.">
+  <meta name="keywords" content="AI路书生成,AI行程单,定制游行路书,travel itinerary generator,roadbook generator,Cursor Skill,Claude Skill,小红书配图,LLM路书,Agent Skill,trip planner">
+  <meta property="og:title" content="skills-travel-planner — 开源 AI 路书生成工具">
+  <meta property="og:description" content="让 AI Agent 直接交付客户级行程 HTML。简表进、路书出。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://skills-travel-planner.vercel.app">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css">
+  <link rel="canonical" href="https://skills-travel-planner.vercel.app">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="#">skills-<span>travel-planner</span></a>
+      <nav class="nav">
+        <a href="#features">功能</a>
+        <a href="#pipeline">流水线</a>
+        <a href="#quickstart">快速开始</a>
+        <a class="btn btn-primary btn-sm" href="https://github.com/huanyuzhilv/skills-travel-planner" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-badge">MIT 开源 · Agent Skill</div>
+        <h1>开源 AI 路书生成器<br>让 Agent 直接交付客户级行程 HTML</h1>
+        <p class="subtitle">简表进、路书出。结构化 tripData + 小红书配图 + LLM 润色 + 飞猪酒店，专为定制游顾问与 AI 编程助手设计。</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://github.com/huanyuzhilv/skills-travel-planner" target="_blank" rel="noopener">GitHub 开源</a>
+          <a class="btn btn-secondary" href="#quickstart">5 分钟上手</a>
+        </div>
+        <div class="hero-keywords">
+          <span class="tag">AI 路书生成</span>
+          <span class="tag">roadbook generator</span>
+          <span class="tag">Cursor Skill</span>
+          <span class="tag">Claude Code</span>
+          <span class="tag">tripData.json</span>
+          <span class="tag">小红书配图</span>
+          <span class="tag">定制游</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="pipeline">
+      <div class="container">
+        <h2>交付流水线</h2>
+        <p class="section-desc">一条命令串联 Intake → Enrich → 配图 → 校验 → HTML，Agent 无需反复确认是否跑交付。</p>
+        <div class="pipeline">
+          <div class="step">
+            <div class="step-num">1</div>
+            <h3>Intake</h3>
+            <p>txt/docx 简表 → tripData.json</p>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <h3>Enrich</h3>
+            <p>每日正文、住宿、亮点 LLM 润色</p>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <h3>配图</h3>
+            <p>TikHub 小红书 + 飞猪兜底链</p>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <h3>Validate</h3>
+            <p>strict https 备选图校验</p>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <h3>HTML</h3>
+            <p>roadbook-v2 可导出 PDF/长图</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <h2>核心能力</h2>
+        <p class="section-desc">不是简单模板填充，而是面向真实定制游交付的 Agent Skill 工具链。</p>
+        <div class="features">
+          <div class="feature-card">
+            <div class="icon">📋</div>
+            <h3>多形态输入</h3>
+            <p>支持文本简表、Word 文档、截图 OCR。统一解析为可编辑的 tripData.json 结构化数据。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">✍️</div>
+            <h3>LLM 顾问文风</h3>
+            <p>每日导读、行程亮点、费用与服务说明，可选 OpenAI / DeepSeek 统一润色，告别小红书拼接腔。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🖼️</div>
+            <h3>智能配图</h3>
+            <p>按槽位搜索小红书笔记图，交通走飞猪，景点走 Wikimedia 兜底，每槽多备选可切换。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🏨</div>
+            <h3>住宿数据</h3>
+            <p>飞猪 FlyAI 拉取酒店简介与评分，长文案自动 enrich，标注拟定与参考检索。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🤖</div>
+            <h3>Agent 原生</h3>
+            <p>AGENTS.md 硬性交付禁令 + skill.md 完整规范，Cursor / Claude Code / Codex 开箱即用。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">📄</div>
+            <h3>客户可交付</h3>
+            <p>roadbook-v2 HTML 模板，支持浏览器预览、PDF 导出与长图分享，直接发给客人。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>适用场景</h2>
+        <p class="section-desc">无论你是独立顾问还是技术团队，都能快速接入。</p>
+        <div class="use-cases">
+          <div class="use-case">
+            <h3>Cursor / Claude Agent</h3>
+            <p>安装 Skill 后，Agent 自动跑 deliver 流水线，无需手动确认「要不要补图」。</p>
+          </div>
+          <div class="use-case">
+            <h3>定制游工作室</h3>
+            <p>简表到路书 HTML 分钟级产出，保留 tripData 便于二次编辑与版本管理。</p>
+          </div>
+          <div class="use-case">
+            <h3>二次开发者</h3>
+            <p>MIT 协议，可 fork 接入自有 CMS、替换品牌 Logo、扩展模板与数据源。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quickstart">
+      <div class="container">
+        <h2>快速开始</h2>
+        <p class="section-desc">克隆仓库、配置 TikHub 密钥、跑示例贵州环线。</p>
+        <div class="quickstart">
+          <div class="quickstart-header">
+            <span>Terminal</span>
+            <span>bash</span>
+          </div>
+          <pre><code><span class="comment"># 克隆与配置</span>
+<span class="cmd">git clone</span> https://github.com/huanyuzhilv/skills-travel-planner.git
+<span class="cmd">cd</span> skills-travel-planner
+<span class="cmd">cp</span> .env.example .env
+<span class="comment"># 编辑 .env，填入 TIKHUB_API_KEY（https://user.tikhub.io）</span>
+
+<span class="comment"># 从简表生成</span>
+<span class="cmd">python3</span> scripts/roadbook_intake.py \
+  --input docs/examples/guizhou-brief.txt \
+  --output-dir generated-roadbooks/demo \
+  --render --html-name demo.html
+
+<span class="comment"># 一键交付</span>
+<span class="cmd">python3</span> scripts/deliver_roadbook_v2.py \
+  generated-roadbooks/demo/tripData.json \
+  generated-roadbooks/demo/demo.html \
+  --check-in 2026-05-01 --check-out 2026-05-07</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>依赖说明</h2>
+        <p class="section-desc">核心交付推荐 TikHub；LLM 与飞猪为可选增强。</p>
+        <div class="deps-wrap">
+          <table class="deps-table">
+            <thead>
+              <tr>
+                <th>依赖</th>
+                <th>用途</th>
+                <th>必需</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="https://user.tikhub.io" target="_blank" rel="noopener">TikHub API</a></td>
+                <td>小红书搜索、配图、每日正文素材</td>
+                <td>推荐</td>
+              </tr>
+              <tr>
+                <td>OpenAI / DeepSeek</td>
+                <td>LLM 文案润色（顾问文风）</td>
+                <td>可选</td>
+              </tr>
+              <tr>
+                <td><a href="https://github.com/alibaba-flyai/flyai-skill" target="_blank" rel="noopener">flyai</a></td>
+                <td>飞猪酒店简介、交通配图</td>
+                <td>可选</td>
+              </tr>
+              <tr>
+                <td>Python 3.10+</td>
+                <td>脚本运行时</td>
+                <td>必需</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>skills-travel-planner</strong> — 开源 AI 路书生成工具 · 玩点旅行</p>
+      <p>
+        <a href="https://github.com/huanyuzhilv/skills-travel-planner" target="_blank" rel="noopener">GitHub</a>
+        · MIT License © 2026 <a href="https://github.com/huanyuzhilv" target="_blank" rel="noopener">huanyuzhilv</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

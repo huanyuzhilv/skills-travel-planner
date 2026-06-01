@@ -1,0 +1,251 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Roadbook v2.0 Component Schema",
+  "description": "路书组件化数据结构定义",
+  "type": "object",
+  "required": ["meta", "cover", "components"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "version": { "type": "string", "const": "2.0" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "printLayout": {
+          "type": "object",
+          "description": "印刷/PDF 预分页：generate.py 可自动写入；disableAuto=true 时跳过自动估算",
+          "properties": {
+            "version": { "type": "integer" },
+            "breakBeforeIndices": {
+              "type": "array",
+              "items": { "type": "integer", "minimum": 0 },
+              "description": "历史字段：原在对应根组件前插入打印强分页；当前 v2 模板已不再使用，保留仅为兼容旧 tripData"
+            },
+            "pageBudgetPx": { "type": "number" },
+            "disableAuto": { "type": "boolean", "description": "为 true 时 generate 不再覆盖 breakBeforeIndices" }
+          }
+        }
+      },
+      "required": ["version"]
+    },
+    "cover": {
+      "type": "object",
+      "description": "封面组件（固定不可增删）",
+      "properties": {
+        "backgroundImage": { "$ref": "#/definitions/imageUrlEntry", "description": "背景图：URL / 备选数组 / 带 slotLabel 绑定地点名" },
+        "title": { "type": "string", "description": "AI生成标题，目的地+时间" },
+        "subtitle": { "type": "string", "description": "副标题" },
+        "logo": { "$ref": "#/definitions/imageUrlEntry", "description": "品牌 Logo" }
+      },
+      "required": ["title"]
+    },
+    "components": {
+      "type": "array",
+      "description": "有序组件列表，用户可增删排序",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/definitions/highlights" },
+          { "$ref": "#/definitions/itinerary" },
+          { "$ref": "#/definitions/daily" },
+          { "$ref": "#/definitions/feature" },
+          { "$ref": "#/definitions/text-block" }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "imageUrlEntry": {
+      "description": "图片字段：纯 URL、URL 备选列表，或与地点名 slotLabel 绑定（模板内展示与搜图关键词优先）",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "多张备选 URL，第一张为默认展示"
+        },
+        {
+          "type": "object",
+          "required": ["url"],
+          "properties": {
+            "url": { "type": "string" },
+            "slotLabel": { "type": "string", "description": "地点或素材槽命名" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["alternates"],
+          "properties": {
+            "alternates": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "slotLabel": { "type": "string", "description": "地点或素材槽命名" }
+          }
+        }
+      ]
+    },
+    "highlights": {
+      "type": "object",
+      "description": "行程亮点组件",
+      "properties": {
+        "type": { "const": "highlights" },
+        "id": { "type": "string" },
+        "data": {
+          "type": "object",
+          "properties": {
+            "backgroundImage": { "$ref": "#/definitions/imageUrlEntry", "description": "默认背景图：URL / 备选数组 / 带 slotLabel 绑定地点名" },
+            "title": { "type": "string", "default": "行程亮点" },
+            "content": { "type": "string", "description": "AI生成的亮点介绍文案" },
+            "items": {
+              "type": "array",
+              "description": "亮点列表（可选，替代content）",
+              "items": { "type": "string" }
+            }
+          },
+          "required": ["title"]
+        }
+      },
+      "required": ["type", "id", "data"]
+    },
+    "itinerary": {
+      "type": "object",
+      "description": "行程表组件（双页：标题页+内容页）",
+      "properties": {
+        "type": { "const": "itinerary" },
+        "id": { "type": "string" },
+        "data": {
+          "type": "object",
+          "properties": {
+            "backgroundImage": { "$ref": "#/definitions/imageUrlEntry", "description": "目的地配图：URL / 备选数组 / 带 slotLabel 绑定地点名" },
+            "title": { "type": "string", "default": "行程概览" },
+            "style": { "type": "string", "enum": ["table", "timeline"], "default": "table", "description": "表格形式或线路形式" },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": ["integer", "string"], "description": "第几天，可写数字或 Day1 形式" },
+                  "date": { "type": "string" },
+                  "time": { "type": "string", "description": "当日时段/时间节点（可选）" },
+                  "title": { "type": "string", "description": "当天主题" },
+                  "locations": { "type": "string", "description": "途经地点" },
+                  "transport": { "type": "string", "description": "交通方式" },
+                  "distance": { "type": "string", "description": "行驶距离" },
+                  "accommodation": { "type": "string", "description": "住宿" },
+                  "meals": { "type": "string", "description": "餐食" }
+                },
+                "required": ["day"]
+              }
+            }
+          },
+          "required": ["title", "items"]
+        }
+      },
+      "required": ["type", "id", "data"]
+    },
+    "daily": {
+      "type": "object",
+      "description": "每日介绍组件（可重复，每天一组）",
+      "properties": {
+        "type": { "const": "daily" },
+        "id": { "type": "string" },
+        "data": {
+          "type": "object",
+          "properties": {
+            "backgroundImage": { "$ref": "#/definitions/imageUrlEntry", "description": "目的地配图背景：URL / 备选数组 / 带 slotLabel 绑定地点名" },
+            "title": { "type": "string", "default": "详细行程" },
+            "date": { "type": "string", "description": "如 Day1 5月16日" },
+            "theme": { "type": "string", "description": "当天行程主题" },
+            "description": { "type": "string", "description": "行程介绍(AI扩写)" },
+            "topImages": {
+              "type": "array",
+              "description": "顶部图片区左侧1~3张小图",
+              "items": { "$ref": "#/definitions/imageUrlEntry" },
+              "maxItems": 3
+            },
+            "sideImage": { "$ref": "#/definitions/imageUrlEntry", "description": "右侧主图（排序第 1 张，与 bottomImages 合计最多 8 张）" },
+            "bottomImages": {
+              "type": "array",
+              "description": "右侧其余配图（最多 7 张；与 sideImage 合计最多 8 张，顺序即展示顺序）",
+              "items": { "$ref": "#/definitions/imageUrlEntry" },
+              "maxItems": 7
+            }
+          },
+          "required": ["date", "theme"]
+        }
+      },
+      "required": ["type", "id", "data"]
+    },
+    "feature": {
+      "type": "object",
+      "description": "特点介绍组件（可重复：住宿/餐饮/交通等）",
+      "properties": {
+        "type": { "const": "feature" },
+        "id": { "type": "string" },
+        "data": {
+          "type": "object",
+          "properties": {
+            "backgroundImage": { "$ref": "#/definitions/imageUrlEntry", "description": "根据主题的配图背景：URL / 备选数组 / 带 slotLabel 绑定地点名" },
+            "title": { "type": "string", "description": "如 住宿介绍/餐饮特色/交通安排" },
+            "subtype": { "type": "string", "enum": ["住宿", "餐饮", "交通", "摄影", "其他"], "description": "子类型" },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "description": "卡片标题" },
+                  "description": { "type": "string", "description": "介绍内容(AI扩写)" },
+                  "images": {
+                    "type": "array",
+                    "description": "配图：住宿、交通子类型最多 8 张（酒店卡右栏，与每日行程右侧逻辑一致）；其余子类型模板侧最多展示 3 张",
+                    "items": { "$ref": "#/definitions/imageUrlEntry" },
+                    "maxItems": 8
+                  }
+                },
+                "required": ["title"]
+              }
+            }
+          },
+          "required": ["title", "items"]
+        }
+      },
+      "required": ["type", "id", "data"]
+    },
+    "text-block": {
+      "type": "object",
+      "description": "文字说明组件（可重复：费用/服务/规则/须知等）",
+      "properties": {
+        "type": { "const": "text-block" },
+        "id": { "type": "string" },
+        "data": {
+          "type": "object",
+          "properties": {
+            "backgroundImage": { "$ref": "#/definitions/imageUrlEntry", "description": "默认背景图：URL / 备选数组 / 带 slotLabel 绑定地点名" },
+            "title": { "type": "string", "description": "版面主标题；费用块为「费用说明」，服务块为「服务说明」。出行须知有正文时在导出中并入服务说明并统一为此标题；无正文则移除该组件。" },
+            "subtype": { "type": "string", "enum": ["费用", "服务", "规则", "须知", "其他"] },
+            "content": { "type": "string", "description": "正文 HTML。subtype 为费用/服务（及遗留须知）时为整页富文本（含列表）；规则/其他可为纯文本或 HTML。须知无正文时应在 generate 阶段移除；有正文则并入服务块。" },
+            "lines": {
+              "type": "array",
+              "description": "已弃用（仅兼容旧 tripData）：首次渲染会并入 content 后删除",
+              "items": { "type": "string" }
+            },
+            "sections": {
+              "type": "array",
+              "description": "可选分段结构",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "heading": { "type": "string" },
+                  "body": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["title"]
+        }
+      },
+      "required": ["type", "id", "data"]
+    }
+  }
+}

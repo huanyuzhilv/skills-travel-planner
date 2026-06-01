@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>路书</title>
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-light: #6BB5FF;
+  --primary-dark: #2E6DB4;
+  --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --gradient-cover: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+  --bg: #f3f4f6;
+  --card: #ffffff;
+  --text: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --gap: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 40px;
+}
+
+.container {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* ========== 顶部工具栏 ========== */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 750px;
+  margin: 0 auto;
+}
+.toolbar .toolbar-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-right: auto;
+}
+.toolbar button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.toolbar .btn-edit {
+  background: var(--primary);
+  color: #fff;
+}
+.toolbar .btn-edit.active {
+  background: #ef4444;
+}
+.toolbar .btn-save {
+  background: #f3f4f6;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.toolbar .btn-export {
+  background: #10b981;
+  color: #fff;
+}
+.toolbar button:active { transform: scale(0.95); }
+
+/* ========== 模块通用 ========== */
+section[data-module] {
+  margin: var(--gap) var(--gap) 0;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.module-header {
+  padding: 14px 20px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.module-header svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.module-body { padding: 20px; }
+
+/* ========== 封面 ========== */
+section[data-module="cover"] {
+  margin: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  position: relative;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+section[data-module="cover"] .cover-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+section[data-module="cover"] .cover-placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 800;
+}
+section[data-module="cover"] .cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-cover);
+}
+section[data-module="cover"] .cover-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px 24px 32px;
+  color: #fff;
+}
+.cover-content .cover-title {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.3;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  margin-bottom: 8px;
+}
+.cover-content .cover-subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+.cover-content .cover-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.cover-content .cover-meta span {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ========== 亮点 ========== */
+section[data-module="highlights"] .module-header { background: var(--gradient-1); }
+.highlights-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.highlight-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #f0f4ff;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+.highlight-tag svg { width: 16px; height: 16px; }
+.highlight-group { margin-bottom: 16px; }
+.highlight-category { font-size: 15px; font-weight: 600; color: #1f2937; margin-bottom: 8px; padding-left: 4px; }
+.highlight-group .highlight-item { padding-left: 16px; font-size: 14px; color: var(--text-secondary); line-height: 2; }
+
+/* ========== 行程总览 ========== */
+section[data-module="itinerary-overview"] .module-header { background: var(--gradient-3); }
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--primary-light), var(--primary-dark));
+  border-radius: 2px;
+}
+.timeline-item {
+  position: relative;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 20px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+.timeline-item .ti-day {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.timeline-item .ti-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2px;
+}
+.timeline-item .ti-summary {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.timeline-img-wrapper {
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 120px;
+}
+.timeline-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* ========== 每日详情 ========== */
+section[data-module="daily-detail"] .module-header { background: var(--gradient-5); }
+.day-card {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.day-card:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+.day-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.day-badge {
+  background: var(--primary);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.day-theme {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+}
+.activity-item {
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.activity-item .activity-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-sm);
+}
+.activity-item .activity-img-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(79,70,229,0.5);
+}
+.activity-item .activity-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 10px;
+  color: var(--text);
+}
+.activity-item .activity-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.7;
+}
+.activity-item .activity-extra {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.activity-item .activity-extra span {
+  font-size: 12px;
+  padding: 3px 10px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.day-meals {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.day-meals strong { color: var(--text); }
+
+/* ========== 车辆 ========== */
+section[data-module="vehicles"] .module-header { background: linear-gradient(135deg, #667eea, #4facfe); }
+.vehicle-card {
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.vehicle-card:last-child { margin-bottom: 0; }
+.vehicle-card .vehicle-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+.vehicle-card .vehicle-img-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(59,130,246,0.5);
+}
+.vehicle-card .vehicle-info { padding: 14px 16px; }
+.vehicle-card .vehicle-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+.vehicle-card .vehicle-seats {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.vehicle-card .vehicle-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.vehicle-card .vehicle-features span {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: #eff6ff;
+  color: var(--primary-dark);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* ========== 酒店 ========== */
+section[data-module="hotels"] .module-header { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+.hotel-card {
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.hotel-card:last-child { margin-bottom: 0; }
+.hotel-card .hotel-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+.hotel-card .hotel-img-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(124,58,237,0.4);
+}
+.hotel-card .hotel-info { padding: 14px 16px; }
+.hotel-card .hotel-name {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hotel-card .hotel-star {
+  font-size: 12px;
+  color: #f59e0b;
+}
+.hotel-card .hotel-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+.hotel-card .hotel-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.hotel-card .hotel-features span {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: #f5f3ff;
+  color: #6d28d9;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.hotel-day-label { display:inline-block; background:#3b82f6; color:#fff; padding:2px 8px; border-radius:10px; font-size:12px; margin-bottom:4px; }
+.hotel-rating { display:inline-block; background:#f59e0b; color:#fff; padding:2px 8px; border-radius:10px; font-size:12px; margin-left:6px; }
+.hotel-stats { display:flex; gap:12px; font-size:12px; color:#6b7280; margin:6px 0; flex-wrap:wrap; }
+.hotel-desc { font-size:13px; color:#4b5563; line-height:1.6; margin-top:8px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* ========== 美食 ========== */
+section[data-module="foods"] .module-header { background: linear-gradient(135deg, #f97316, #ef4444); }
+.food-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.food-card {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.food-card .food-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+}
+.food-card .food-img-placeholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  font-size: 16px;
+  font-weight: 800;
+  color: rgba(217,119,6,0.5);
+}
+.food-card .food-info { padding: 10px 12px; }
+.food-card .food-name { font-size: 14px; font-weight: 700; }
+.food-card .food-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+
+/* ========== 航班 ========== */
+section[data-module="flights"] .module-header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.flight-card {
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.flight-card:last-child { margin-bottom: 0; }
+.flight-direction {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  margin-bottom: 8px;
+}
+.flight-route {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.flight-arrow {
+  font-size: 16px;
+  color: var(--primary);
+}
+.flight-city { white-space: nowrap; }
+.flight-info {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.flight-note {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ========== 摄影服务 ========== */
+section[data-module="photography"] .module-header { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+.photo-services {
+  list-style: none;
+  padding: 0;
+}
+.photo-services li {
+  padding: 10px 0 10px 32px;
+  position: relative;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border);
+  line-height: 1.7;
+}
+.photo-services li:last-child { border-bottom: none; }
+.photo-services li::before {
+  content: '✓';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  width: 20px;
+  height: 20px;
+  background: #fdf2f8;
+  color: #ec4899;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  background: #fdf2f8;
+  border-radius: 8px;
+}
+.photo-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.photo-meta span {
+  font-size: 13px;
+  padding: 4px 12px;
+  background: #fdf2f8;
+  color: #be185d;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* ========== 餐厅推荐 ========== */
+section[data-module="restaurants"] .module-header { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.restaurant-card {
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.restaurant-card:last-child { margin-bottom: 0; }
+.restaurant-card .restaurant-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+.restaurant-card .restaurant-img-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(217,119,6,0.5);
+}
+.restaurant-card .restaurant-info { padding: 14px 16px; }
+.restaurant-card .restaurant-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.restaurant-card .restaurant-location {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.restaurant-card .restaurant-cuisine {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 10px;
+  background: #fffbeb;
+  color: #92400e;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+.restaurant-card .restaurant-rec {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.restaurant-card .restaurant-price {
+  font-size: 13px;
+  color: #d97706;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+/* ========== 伴手礼 ========== */
+section[data-module="souvenirs"] .module-header { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.souvenir-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.souvenir-card {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.souvenir-card .souvenir-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+}
+.souvenir-card .souvenir-img-placeholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  font-size: 16px;
+  font-weight: 800;
+  color: rgba(109,40,217,0.4);
+}
+.souvenir-card .souvenir-info { padding: 10px 12px; }
+.souvenir-card .souvenir-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.souvenir-card .souvenir-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+.souvenir-card .souvenir-price { font-size: 12px; color: #7c3aed; font-weight: 600; margin-top: 4px; }
+
+/* ========== 费用 ========== */
+section[data-module="costs"] .module-header { background: linear-gradient(135deg, #10b981, #059669); }
+.cost-summary {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.cost-summary .cost-item {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px;
+  background: #f0fdf4;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.cost-summary .cost-item .cost-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.cost-summary .cost-item .cost-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #059669;
+  margin-top: 2px;
+}
+.cost-section { margin-bottom: 16px; }
+.cost-section:last-child { margin-bottom: 0; }
+.cost-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  border-bottom: 2px solid var(--primary);
+  display: inline-block;
+}
+.cost-section-title.exclude { border-color: #ef4444; }
+.cost-section ul {
+  list-style: none;
+  padding: 0;
+}
+.cost-section ul li {
+  padding: 8px 0 8px 28px;
+  position: relative;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border);
+  line-height: 1.7;
+}
+.cost-section ul li:last-child { border-bottom: none; }
+.cost-section ul li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 14px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.cost-section.exclude ul li::before { background: #ef4444; }
+
+/* ========== 注意事项 ========== */
+section[data-module="tips"] .module-header { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.tips-list { list-style: none; padding: 0; }
+.tips-list li {
+  padding: 12px 0 12px 36px;
+  position: relative;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border);
+  line-height: 1.7;
+}
+.tips-list li:last-child { border-bottom: none; }
+.tips-list li .tip-num {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========== 备选图片按钮 ========== */
+.img-alt-btn {
+  display: none;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 10;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.img-alt-btn:hover { background: rgba(0,0,0,0.9); }
+body.editing .img-alt-btn { display: block; }
+
+/* 备选图片面板 */
+.alt-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.alt-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.alt-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.alt-panel-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+.alt-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.alt-panel-grid img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.alt-panel-grid img:hover {
+  border-color: #4f46e5;
+  transform: scale(1.03);
+}
+.alt-local-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.alt-local-btn:hover { opacity: 0.85; }
+
+/* ========== 编辑模式 ========== */
+body.editing [contenteditable="true"] {
+  outline: 2px dashed #93c5fd;
+  outline-offset: 2px;
+  border-radius: 4px;
+  min-height: 1em;
+}
+body.editing .img-edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: inherit;
+}
+body.editing .img-wrapper:hover .img-edit-overlay { opacity: 1; }
+body:not(.editing) .img-edit-overlay { display: none !important; }
+
+/* 右上角常驻“换图”按钮（仅编辑模式可见） */
+.img-replace-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  display: none;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.95);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+}
+.img-replace-btn:hover { background: rgba(124, 58, 237, 1); transform: translateY(-1px); }
+/* 已隐藏右上角“换图”按钮：编辑仍可通过图片 hover 蒙层触发 */
+/* body.editing .img-replace-btn { display: inline-flex; } */
+
+section[data-module="cover"] .img-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.img-wrapper {
+  position: relative;
+  display: block;
+}
+
+/* ========== 打印样式 ========== */
+@media print {
+  .toolbar { display: none !important; }
+  body { background: #fff; padding: 0; }
+  .container { max-width: 100%; }
+  section[data-module] {
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  body.editing [contenteditable="true"] { outline: none; }
+  .img-edit-overlay { display: none !important; }
+  .img-replace-btn { display: none !important; }
+}
+
+@media (max-width: 750px) {
+  .container { max-width: 100%; }
+  section[data-module] { margin: 12px 12px 0; border-radius: 14px; }
+  section[data-module="cover"] { margin: 0; border-radius: 0 0 14px 14px; }
+  .toolbar { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 工具栏 -->
+  <div class="toolbar" id="toolbar">
+    <span class="toolbar-title">路书预览</span>
+    <button class="btn-edit" id="btnEdit" onclick="toggleEdit()">编辑模式</button>
+    <button class="btn-save" id="btnSave" onclick="saveData()">保存</button>
+    <button class="btn-export" id="btnExport" onclick="exportPDF()">导出PDF</button>
+  </div>
+
+  <!-- 1. 封面 -->
+  <section data-module="cover" id="sec-cover"></section>
+
+  <!-- 航班信息 -->
+  <section data-module="flights" id="sec-flights">
+    <div class="module-header" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 22-7z"/></svg>
+      航班信息
+    </div>
+    <div class="module-body" id="flights-body"></div>
+  </section>
+
+  <!-- 2. 产品亮点 -->
+  <section data-module="highlights" id="sec-highlights">
+    <div class="module-header" style="background:var(--gradient-1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      产品亮点
+    </div>
+    <div class="module-body" id="highlights-body"></div>
+  </section>
+
+  <!-- 3. 行程总览 -->
+  <section data-module="itinerary-overview" id="sec-itinerary-overview">
+    <div class="module-header" style="background:var(--gradient-3)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      行程总览
+    </div>
+    <div class="module-body" id="overview-body"></div>
+  </section>
+
+  <!-- 4. 每日行程详情 -->
+  <section data-module="daily-detail" id="sec-daily-detail">
+    <div class="module-header" style="background:var(--gradient-5)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      每日行程
+    </div>
+    <div class="module-body" id="daily-body"></div>
+  </section>
+
+  <!-- 5. 车辆介绍 -->
+  <section data-module="vehicles" id="sec-vehicles">
+    <div class="module-header" style="background:linear-gradient(135deg,#667eea,#4facfe)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="22" height="12" rx="3"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M5 10h14"/></svg>
+      车辆介绍
+    </div>
+    <div class="module-body" id="vehicles-body"></div>
+  </section>
+
+  <!-- 摄影服务 -->
+  <section data-module="photography" id="sec-photography">
+    <div class="module-header" style="background:linear-gradient(135deg,#ec4899,#f43f5e)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      摄影服务
+    </div>
+    <div class="module-body" id="photography-body"></div>
+  </section>
+
+  <!-- 6. 精选酒店 -->
+  <section data-module="hotels" id="sec-hotels">
+    <div class="module-header" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 11h4v4H6zM14 11h4v4h-4zM9 3h6l3 4H6l3-4z"/></svg>
+      精选酒店
+    </div>
+    <div class="module-body" id="hotels-body"></div>
+  </section>
+
+  <!-- 7. 美食推荐 -->
+  <section data-module="foods" id="sec-foods">
+    <div class="module-header" style="background:linear-gradient(135deg,#f97316,#ef4444)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      美食推荐
+    </div>
+    <div class="module-body" id="foods-body"></div>
+  </section>
+
+  <!-- 餐厅推荐 -->
+  <section data-module="restaurants" id="sec-restaurants">
+    <div class="module-header" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+      餐厅推荐
+    </div>
+    <div class="module-body" id="restaurants-body"></div>
+  </section>
+
+  <!-- 伴手礼推荐 -->
+  <section data-module="souvenirs" id="sec-souvenirs">
+    <div class="module-header" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+      伴手礼推荐
+    </div>
+    <div class="module-body" id="souvenirs-body"></div>
+  </section>
+
+  <!-- 8. 费用明细 -->
+  <section data-module="costs" id="sec-costs">
+    <div class="module-header" style="background:linear-gradient(135deg,#10b981,#059669)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      费用明细
+    </div>
+    <div class="module-body" id="costs-body"></div>
+  </section>
+
+  <!-- 9. 注意事项 -->
+  <section data-module="tips" id="sec-tips">
+    <div class="module-header" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      注意事项
+    </div>
+    <div class="module-body" id="tips-body"></div>
+  </section>
+</div>
+
+<script>
+const tripData = TRIP_DATA;
+
+/* ========== 工具函数 ========== */
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'": '&#39;'}[c])); }
+function txt(v, fb) { return String(v ?? '').trim() || (fb || ''); }
+
+/* ========== 渲染封面 ========== */
+function renderCover() {
+  const sec = document.getElementById('sec-cover');
+  const coverImg = tripData.coverImage || '';
+  const imgHtml = coverImg
+    ? `<img class="cover-bg" src="${esc(coverImg)}" alt="${esc(tripData.title)}" data-field="coverImage">`
+    : `<div class="cover-placeholder">${esc(txt(tripData.title, '路书').slice(0, 4))}</div>`;
+  sec.innerHTML = `
+    <div class="img-wrapper" data-path="/coverImage">
+      ${imgHtml}
+      <div class="cover-overlay"></div>
+      <div class="img-edit-overlay">点击替换封面图片</div>
+      <button class="img-replace-btn" type="button">🖼 换图</button>
+    </div>
+    <div class="cover-content">
+      <div class="cover-title" contenteditable="false" data-field="title">${esc(txt(tripData.title, '旅行路书'))}</div>
+      <div class="cover-subtitle" contenteditable="false" data-field="subtitle">${esc(txt(tripData.subtitle, ''))}</div>
+      <div class="cover-meta">
+        ${tripData.duration ? `<span data-field="duration">${esc(tripData.duration)}</span>` : ''}
+        ${tripData.travelers ? `<span data-field="travelers">${esc(tripData.travelers)}</span>` : ''}
+        ${tripData.origin ? `<span data-field="origin">${esc(tripData.origin)}</span>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ========== 渲染亮点 ========== */
+function renderHighlights() {
+  const body = document.getElementById('highlights-body');
+  const items = Array.isArray(tripData.highlights) ? tripData.highlights : [];
+  if (!items.length) { document.getElementById('sec-highlights').style.display = 'none'; return; }
+
+  // 判断是分类格式还是简单字符串格式
+  if (typeof items[0] === 'string') {
+    // 格式A：原有逻辑，简单列表
+    body.innerHTML = `<div class="highlights-list">${items.map(h =>
+      `<span class="highlight-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span contenteditable="false" data-field="highlight">${esc(h)}</span></span>`
+    ).join('')}</div>`;
+  } else {
+    // 格式B：分类展示
+    body.innerHTML = items.map(group => `
+      <div class="highlight-group">
+        <div class="highlight-category">${esc(group.icon || '✦')} ${esc(group.category || '')}</div>
+        <div class="highlight-list">
+          ${(Array.isArray(group.items) ? group.items : []).map(item => `<div class="highlight-item" contenteditable="false">• ${esc(item)}</div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+/* ========== 渲染行程总览 ========== */
+function renderOverview() {
+  const body = document.getElementById('overview-body');
+  const items = Array.isArray(tripData.itineraryOverview) ? tripData.itineraryOverview : [];
+  if (!items.length) { document.getElementById('sec-itinerary-overview').style.display = 'none'; return; }
+  const days = Array.isArray(tripData.days) ? tripData.days : [];
+  body.innerHTML = `<div class="timeline">${items.map((item, idx) => {
+    // 图片：优先用 overview 自带的，否则取当天第一个活动的图片
+    let imgUrl = item.imageUrl || '';
+    if (!imgUrl && days[idx] && Array.isArray(days[idx].activities) && days[idx].activities.length > 0) {
+      imgUrl = days[idx].activities[0].imageUrl || '';
+    }
+    const ovPath = `/itineraryOverview/${idx}/imageUrl`;
+    const imgHtml = imgUrl
+      ? `<div class="img-wrapper timeline-img-wrapper" data-path="${ovPath}"><img class="timeline-img" src="${esc(imgUrl)}" alt="${esc(item.title || '')}" data-field="ov-img"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button></div>`
+      : `<div class="img-wrapper timeline-img-wrapper" data-path="${ovPath}" style="min-height:90px;"><div class="timeline-img-placeholder" style="height:90px;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;border-radius:8px;font-size:13px;">点击添加图片</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button></div>`;
+    return `<div class="timeline-item">
+      <div class="ti-day">${esc(item.day || '')} ${esc(item.date || '')}</div>
+      <div class="ti-title" contenteditable="false" data-field="ov-title">${esc(item.title || '')}</div>
+      <div class="ti-summary">${esc(item.summary || '')}</div>
+      ${imgHtml}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ========== 渲染每日详情 ========== */
+function renderDaily() {
+  const body = document.getElementById('daily-body');
+  const days = Array.isArray(tripData.days) ? tripData.days : [];
+  if (!days.length) { document.getElementById('sec-daily-detail').style.display = 'none'; return; }
+  body.innerHTML = days.map((day, i) => {
+    const activities = Array.isArray(day.activities) ? day.activities : [];
+    const activitiesHtml = activities.map((act, ai) => {
+      const imgUrl = act.imageUrl || (Array.isArray(act.imageUrls) && act.imageUrls[0]) || '';
+      const alts = Array.isArray(act.imageUrls) ? act.imageUrls : [];
+      const altBtn = alts.length > 1 ? `<button class="img-alt-btn" data-alts='${JSON.stringify(alts)}'>备选 ${alts.length}张</button>` : '';
+      const actPath = `/days/${i}/activities/${ai}/imageUrl`;
+      const imgHtml = imgUrl
+        ? `<div class="img-wrapper" data-path="${actPath}"><img class="activity-img" src="${esc(imgUrl)}" alt="${esc(act.name)}" data-field="activity-img"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`
+        : `<div class="img-wrapper" data-path="${actPath}"><div class="activity-img-placeholder">${esc(txt(act.name, '景点').slice(0, 4))}</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`;
+      const extras = [];
+      if (act.duration) extras.push(`<span>时长: ${esc(act.duration)}</span>`);
+      if (act.tips) extras.push(`<span>提示: ${esc(act.tips)}</span>`);
+      return `<div class="activity-item">
+        ${imgHtml}
+        <div class="activity-name" contenteditable="false">${esc(act.name || '')}</div>
+        <div class="activity-desc" contenteditable="false">${esc(act.description || '')}</div>
+        ${extras.length ? `<div class="activity-extra">${extras.join('')}</div>` : ''}
+      </div>`;
+    }).join('');
+    const meals = day.meals || {};
+    const mealParts = [];
+    if (meals.breakfast) mealParts.push(`早: ${esc(meals.breakfast)}`);
+    if (meals.lunch) mealParts.push(`午: ${esc(meals.lunch)}`);
+    if (meals.dinner) mealParts.push(`晚: ${esc(meals.dinner)}`);
+    const mealHtml = mealParts.length ? `<div class="day-meals"><strong>餐食：</strong>${mealParts.join(' | ')}</div>` : '';
+    const hotelHtml = day.hotel ? `<div class="day-meals"><strong>住宿：</strong>${esc(day.hotel.name || '')} ${day.hotel.roomType ? '(' + esc(day.hotel.roomType) + ')' : ''}</div>` : '';
+    return `<div class="day-card">
+      <div class="day-card-header">
+        <span class="day-badge">D${day.dayNum || (i+1)}</span>
+        <span class="day-theme" contenteditable="false">${esc(day.theme || day.date || '')}</span>
+      </div>
+      ${activitiesHtml}
+      ${mealHtml}
+      ${hotelHtml}
+    </div>`;
+  }).join('');
+}
+
+/* ========== 渲染车辆 ========== */
+function renderVehicles() {
+  const body = document.getElementById('vehicles-body');
+  const items = Array.isArray(tripData.vehicles) ? tripData.vehicles : [];
+  if (!items.length) { document.getElementById('sec-vehicles').style.display = 'none'; return; }
+  body.innerHTML = items.map((v, vi) => {
+    const imgUrl = v.imageUrl || '';
+    const alts = Array.isArray(v.imageUrls) ? v.imageUrls : [];
+    const altBtn = alts.length > 1 ? `<button class="img-alt-btn" data-alts='${JSON.stringify(alts)}'>备选 ${alts.length}张</button>` : '';
+    const vPath = `/vehicles/${vi}/imageUrl`;
+    const imgHtml = imgUrl
+      ? `<div class="img-wrapper" data-path="${vPath}"><img class="vehicle-img" src="${esc(imgUrl)}" alt="${esc(v.name)}" data-field="vehicle-img"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`
+      : `<div class="img-wrapper" data-path="${vPath}"><div class="vehicle-img-placeholder">${esc(txt(v.name, '车辆').slice(0, 4))}</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`;
+    const features = Array.isArray(v.features) ? v.features : [];
+    return `<div class="vehicle-card">
+      ${imgHtml}
+      <div class="vehicle-info">
+        <div class="vehicle-name" contenteditable="false">${esc(v.name || '')}</div>
+        <div class="vehicle-seats">${v.seats ? esc(v.seats) + '座' : ''}</div>
+        ${features.length ? `<div class="vehicle-features">${features.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ========== 渲染酒店 ========== */
+function renderHotels() {
+  const body = document.getElementById('hotels-body');
+  const items = Array.isArray(tripData.hotels) ? tripData.hotels : [];
+  if (!items.length) { document.getElementById('sec-hotels').style.display = 'none'; return; }
+  body.innerHTML = items.map((h, hi) => {
+    const imgUrl = h.imageUrl || (Array.isArray(h.roomImages) && h.roomImages[0]) || '';
+    const alts = Array.isArray(h.roomImages) ? h.roomImages : [];
+    const altBtn = alts.length > 1 ? `<button class="img-alt-btn" data-alts='${JSON.stringify(alts)}'>备选 ${alts.length}张</button>` : '';
+    const hPath = `/hotels/${hi}/imageUrl`;
+    const imgHtml = imgUrl
+      ? `<div class="img-wrapper" data-path="${hPath}"><img class="hotel-img" src="${esc(imgUrl)}" alt="${esc(h.name)}" data-field="hotel-img"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`
+      : `<div class="img-wrapper" data-path="${hPath}"><div class="hotel-img-placeholder">${esc(txt(h.name, '酒店').slice(0, 4))}</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`;
+    const stars = h.star ? '★'.repeat(h.star) : '';
+    const features = Array.isArray(h.features) ? h.features : [];
+    // 新增字段
+    const dayLabelHtml = h.dayLabel ? `<span class="hotel-day-label">${esc(h.dayLabel)}</span>` : '';
+    const ratingHtml = h.rating ? `<span class="hotel-rating">${esc(h.rating)}</span>` : '';
+    const statsParts = [];
+    if (h.openYear) statsParts.push(`<span>开业: ${esc(h.openYear)}</span>`);
+    if (h.roomCount) statsParts.push(`<span>客房: ${esc(String(h.roomCount))}间</span>`);
+    if (h.roomArea) statsParts.push(`<span>面积: ${esc(h.roomArea)}</span>`);
+    const statsHtml = statsParts.length ? `<div class="hotel-stats">${statsParts.join('')}</div>` : '';
+    const descHtml = h.description ? `<p class="hotel-desc">${esc(h.description)}</p>` : '';
+    return `<div class="hotel-card">
+      ${imgHtml}
+      <div class="hotel-info">
+        ${dayLabelHtml}
+        <div class="hotel-name"><span contenteditable="false">${esc(h.name || '')}</span>${stars ? `<span class="hotel-star">${stars}</span>` : ''}${ratingHtml}</div>
+        <div class="hotel-detail">${[h.area, h.roomType].filter(Boolean).map(esc).join(' · ')}</div>
+        ${statsHtml}
+        ${descHtml}
+        ${features.length ? `<div class="hotel-features">${features.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ========== 渲染美食 ========== */
+function renderFoods() {
+  const body = document.getElementById('foods-body');
+  const items = Array.isArray(tripData.foods) ? tripData.foods : [];
+  if (!items.length) { document.getElementById('sec-foods').style.display = 'none'; return; }
+  body.innerHTML = `<div class="food-grid">${items.map((f, fi) => {
+    const imgUrl = f.imageUrl || (Array.isArray(f.imageUrls) && f.imageUrls[0]) || '';
+    const alts = Array.isArray(f.imageUrls) ? f.imageUrls : [];
+    const altBtn = alts.length > 1 ? `<button class="img-alt-btn" data-alts='${JSON.stringify(alts)}'>备选 ${alts.length}张</button>` : '';
+    const fPath = `/foods/${fi}/imageUrl`;
+    const imgHtml = imgUrl
+      ? `<div class="img-wrapper" data-path="${fPath}"><img class="food-img" src="${esc(imgUrl)}" alt="${esc(f.name)}" data-field="food-img"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`
+      : `<div class="img-wrapper" data-path="${fPath}"><div class="food-img-placeholder">${esc(txt(f.name, '美食').slice(0, 4))}</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button>${altBtn}</div>`;
+    return `<div class="food-card">
+      ${imgHtml}
+      <div class="food-info">
+        <div class="food-name" contenteditable="false">${esc(f.name || '')}</div>
+        <div class="food-desc" contenteditable="false">${esc(f.description || '')}</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ========== 渲染航班 ========== */
+function renderFlights() {
+  const body = document.getElementById('flights-body');
+  const items = Array.isArray(tripData.flights) ? tripData.flights : [];
+  if (!items.length) { document.getElementById('sec-flights').style.display = 'none'; return; }
+  body.innerHTML = items.map(f => `
+    <div class="flight-card" style="border-left:4px solid ${f.direction === '去程' ? '#3b82f6' : '#10b981'}">
+      <div class="flight-direction">${esc(f.direction || '')}</div>
+      <div class="flight-route">
+        <span class="flight-city">${esc(f.departure || '')}</span>
+        <span class="flight-arrow">✈ →</span>
+        <span class="flight-city">${esc(f.arrival || '')}</span>
+      </div>
+      <div class="flight-info">
+        <span>${esc(f.flightNo || '')}</span>
+        <span>${esc(f.date || '')} ${esc(f.departTime || '')}-${esc(f.arriveTime || '')}</span>
+      </div>
+      ${f.note ? '<div class="flight-note">' + esc(f.note) + '</div>' : ''}
+    </div>
+  `).join('');
+}
+
+/* ========== 渲染摄影服务 ========== */
+function renderPhotography() {
+  const body = document.getElementById('photography-body');
+  const photo = tripData.photography || {};
+  if (!photo.included && !(Array.isArray(photo.services) && photo.services.length)) {
+    document.getElementById('sec-photography').style.display = 'none'; return;
+  }
+  const services = Array.isArray(photo.services) ? photo.services : [];
+  const metaParts = [];
+  if (photo.days) metaParts.push(`<span>跟拍 ${esc(photo.days)}</span>`);
+  if (photo.photographer) metaParts.push(`<span>摄影师: ${esc(photo.photographer)}</span>`);
+  const metaHtml = metaParts.length ? `<div class="photo-meta">${metaParts.join('')}</div>` : '';
+  const listHtml = services.length ? `<ul class="photo-services">${services.map(s => `<li>${esc(s)}</li>`).join('')}</ul>` : '';
+  const noteHtml = photo.note ? `<div class="photo-note">${esc(photo.note)}</div>` : '';
+  body.innerHTML = metaHtml + listHtml + noteHtml;
+}
+
+/* ========== 渲染餐厅推荐 ========== */
+function renderRestaurants() {
+  const body = document.getElementById('restaurants-body');
+  const items = Array.isArray(tripData.restaurants) ? tripData.restaurants : [];
+  if (!items.length) { document.getElementById('sec-restaurants').style.display = 'none'; return; }
+  body.innerHTML = items.map((r, ri) => {
+    const imgUrl = r.imageUrl || '';
+    const rPath = `/restaurants/${ri}/imageUrl`;
+    const imgHtml = imgUrl
+      ? `<div class="img-wrapper" data-path="${rPath}"><img class="restaurant-img" src="${esc(imgUrl)}" alt="${esc(r.name)}"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button></div>`
+      : `<div class="img-wrapper" data-path="${rPath}"><div class="restaurant-img-placeholder">${esc(txt(r.name, '餐厅').slice(0, 4))}</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button></div>`;
+    return `<div class="restaurant-card">
+      ${imgHtml}
+      <div class="restaurant-info">
+        <div class="restaurant-name">${esc(r.name || '')}</div>
+        <div class="restaurant-location">${esc(r.location || '')}</div>
+        ${r.cuisine ? `<span class="restaurant-cuisine">${esc(r.cuisine)}</span>` : ''}
+        ${r.recommendation ? `<div class="restaurant-rec">${esc(r.recommendation)}</div>` : ''}
+        ${r.priceRange ? `<div class="restaurant-price">${esc(r.priceRange)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ========== 渲染伴手礼 ========== */
+function renderSouvenirs() {
+  const body = document.getElementById('souvenirs-body');
+  const items = Array.isArray(tripData.souvenirs) ? tripData.souvenirs : [];
+  if (!items.length) { document.getElementById('sec-souvenirs').style.display = 'none'; return; }
+  body.innerHTML = `<div class="souvenir-grid">${items.map((s, si) => {
+    const imgUrl = s.imageUrl || '';
+    const sPath = `/souvenirs/${si}/imageUrl`;
+    const imgHtml = imgUrl
+      ? `<div class="img-wrapper" data-path="${sPath}"><img class="souvenir-img" src="${esc(imgUrl)}" alt="${esc(s.name)}"><div class="img-edit-overlay">点击替换图片</div><button class="img-replace-btn" type="button">🖼 换图</button></div>`
+      : `<div class="img-wrapper" data-path="${sPath}"><div class="souvenir-img-placeholder">${esc(txt(s.name, '伴手礼').slice(0, 4))}</div><div class="img-edit-overlay">点击添加图片</div><button class="img-replace-btn" type="button">🖼 换图</button></div>`;
+    return `<div class="souvenir-card">
+      ${imgHtml}
+      <div class="souvenir-info">
+        <div class="souvenir-name">${esc(s.name || '')}</div>
+        <div class="souvenir-desc">${esc(s.description || '')}</div>
+        ${s.priceRange ? `<div class="souvenir-price">${esc(s.priceRange)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ========== 渲染费用 ========== */
+function renderCosts() {
+  const body = document.getElementById('costs-body');
+  const costs = tripData.costs || {};
+  if (!costs.included && !costs.excluded) { document.getElementById('sec-costs').style.display = 'none'; return; }
+  const summaryItems = [];
+  if (costs.pricePerPerson) summaryItems.push({label: '成人价', value: '¥' + costs.pricePerPerson});
+  if (costs.childPrice) summaryItems.push({label: '儿童价', value: '¥' + costs.childPrice});
+  if (costs.totalPrice) summaryItems.push({label: '总价', value: '¥' + costs.totalPrice});
+  const summaryHtml = summaryItems.length ? `<div class="cost-summary">${summaryItems.map(s => `<div class="cost-item"><div class="cost-label">${esc(s.label)}</div><div class="cost-value">${esc(s.value)}</div></div>`).join('')}</div>` : '';
+  const noteHtml = costs.priceNote ? `<p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">${esc(costs.priceNote)}</p>` : '';
+  const includedList = Array.isArray(costs.included) ? costs.included : [];
+  const excludedList = Array.isArray(costs.excluded) ? costs.excluded : [];
+  const includedHtml = includedList.length ? `<div class="cost-section"><div class="cost-section-title">费用包含</div><ul>${includedList.map(i => `<li contenteditable="false">${esc(i)}</li>`).join('')}</ul></div>` : '';
+  const excludedHtml = excludedList.length ? `<div class="cost-section exclude"><div class="cost-section-title exclude">费用不含</div><ul>${excludedList.map(i => `<li contenteditable="false">${esc(i)}</li>`).join('')}</ul></div>` : '';
+  body.innerHTML = summaryHtml + noteHtml + includedHtml + excludedHtml;
+}
+
+/* ========== 渲染注意事项 ========== */
+function renderTips() {
+  const body = document.getElementById('tips-body');
+  const items = Array.isArray(tripData.tips) ? tripData.tips : [];
+  if (!items.length) { document.getElementById('sec-tips').style.display = 'none'; return; }
+  body.innerHTML = `<ul class="tips-list">${items.map((t, i) =>
+    `<li><span class="tip-num">${i + 1}</span><span contenteditable="false">${esc(t)}</span></li>`
+  ).join('')}</ul>`;
+}
+
+/* ========== 编辑功能 ========== */
+let isEditing = false;
+
+function toggleEdit() {
+  isEditing = !isEditing;
+  document.body.classList.toggle('editing', isEditing);
+  const btn = document.getElementById('btnEdit');
+  btn.textContent = isEditing ? '退出编辑' : '编辑模式';
+  btn.classList.toggle('active', isEditing);
+  // 切换所有 contenteditable
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = isEditing ? 'true' : 'false';
+  });
+  // 绑定图片点击：overlay 全屏遮罩 + 右上角“换图”按钮，同一菜单逻辑
+  if (isEditing) {
+    document.querySelectorAll('.img-edit-overlay').forEach(ov => {
+      ov.onclick = function(e) {
+        e.stopPropagation();
+        openImageMenu(this.closest('.img-wrapper'));
+      };
+    });
+    document.querySelectorAll('.img-replace-btn').forEach(btn => {
+      btn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openImageMenu(this.closest('.img-wrapper'));
+      };
+    });
+  }
+}
+
+/* ========== 统一的图片替换菜单（URL / 本地上传） ========== */
+function openImageMenu(wrapper) {
+  if (!wrapper) return;
+  const existing = wrapper.querySelector('img');
+  const menu = document.createElement('div');
+  menu.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4)';
+  menu.innerHTML = `
+    <div style="background:#fff;border-radius:12px;padding:24px;width:280px;text-align:center;">
+      <div style="font-size:16px;font-weight:600;margin-bottom:16px;">替换图片</div>
+      <button id="img-url-btn" style="display:block;width:100%;padding:10px;margin-bottom:8px;border:1px solid #ddd;border-radius:8px;background:#f9fafb;cursor:pointer;font-size:14px;">输入图片URL</button>
+      <button id="img-local-btn" style="display:block;width:100%;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;cursor:pointer;font-size:14px;">选择本地图片</button>
+      <button id="img-cancel-btn" style="display:block;width:100%;padding:8px;margin-top:8px;border:none;background:none;cursor:pointer;color:#666;font-size:13px;">取消</button>
+    </div>`;
+  document.body.appendChild(menu);
+
+  function applyNewSrc(src) {
+    if (existing) { existing.src = src; return; }
+    const placeholder = wrapper.querySelector('[class$="-placeholder"]');
+    if (placeholder) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = placeholder.className.replace('-placeholder', '');
+      img.alt = '';
+      wrapper.insertBefore(img, placeholder);
+      placeholder.remove();
+    }
+  }
+
+  menu.querySelector('#img-cancel-btn').onclick = () => menu.remove();
+  menu.addEventListener('click', (e) => { if (e.target === menu) menu.remove(); });
+
+  menu.querySelector('#img-url-btn').onclick = () => {
+    menu.remove();
+    const newUrl = prompt('请输入新的图片URL:');
+    if (newUrl && newUrl.trim()) applyNewSrc(newUrl.trim());
+  };
+
+  menu.querySelector('#img-local-btn').onclick = () => {
+    menu.remove();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) { applyNewSrc(ev.target.result); };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+}
+
+/* ========== JSON Pointer 写入工具 ========== */
+function setByPath(obj, path, value) {
+  if (!path || path[0] !== '/') return;
+  const segs = path.slice(1).split('/').map(s => s.replace(/~1/g, '/').replace(/~0/g, '~'));
+  let cur = obj;
+  for (let i = 0; i < segs.length - 1; i++) {
+    const key = segs[i];
+    const nextKey = segs[i + 1];
+    const nextIsIdx = /^\d+$/.test(nextKey);
+    if (cur[key] == null) cur[key] = nextIsIdx ? [] : {};
+    cur = cur[key];
+  }
+  cur[segs[segs.length - 1]] = value;
+}
+
+function collectData() {
+  // 重构 tripData
+  const data = JSON.parse(JSON.stringify(tripData));
+  // 读取封面文字
+  const coverTitle = document.querySelector('[data-field="title"]');
+  if (coverTitle) data.title = coverTitle.textContent.trim();
+  const coverSub = document.querySelector('[data-field="subtitle"]');
+  if (coverSub) data.subtitle = coverSub.textContent.trim();
+  // 读取封面图（嵌套路径也会被下面的 data-path 回写逻辑覆盖，保留这里作为允许 data-field 的兼容途径）
+  const coverImg = document.querySelector('[data-field="coverImage"]');
+  if (coverImg) data.coverImage = coverImg.src;
+  // 统一回写所有带 data-path 的图片 URL（封面/总览/活动/车辆/酒店/美食/餐厅/伴手礼）
+  document.querySelectorAll('.img-wrapper[data-path]').forEach(wrap => {
+    const path = wrap.getAttribute('data-path');
+    const img = wrap.querySelector('img');
+    if (path && img && img.src) setByPath(data, path, img.src);
+  });
+  // 读取亮点
+  if (Array.isArray(tripData.highlights) && tripData.highlights.length) {
+    if (typeof tripData.highlights[0] === 'string') {
+      // 格式A：从DOM读取编辑后的文本
+      const hlEls = document.querySelectorAll('[data-field="highlight"]');
+      if (hlEls.length) data.highlights = Array.from(hlEls).map(e => e.textContent.trim());
+    } else {
+      // 格式B：分类格式，从DOM读取编辑后的items文本，保持分类结构
+      const groups = document.querySelectorAll('.highlight-group');
+      if (groups.length) {
+        data.highlights = Array.from(groups).map((g, idx) => {
+          const original = tripData.highlights[idx] || {};
+          const itemEls = g.querySelectorAll('.highlight-item');
+          return {
+            category: original.category || '',
+            icon: original.icon || '✦',
+            items: Array.from(itemEls).map(el => el.textContent.replace(/^•\s*/, '').trim())
+          };
+        });
+      }
+    }
+  }
+  // 读取行程总览
+  const ovTitles = document.querySelectorAll('[data-field="ov-title"]');
+  if (ovTitles.length && data.itineraryOverview) {
+    ovTitles.forEach((el, i) => { if (data.itineraryOverview[i]) data.itineraryOverview[i].title = el.textContent.trim(); });
+  }
+  // 读取费用列表
+  const costSections = document.querySelectorAll('.cost-section');
+  costSections.forEach(sec => {
+    const isExclude = sec.classList.contains('exclude');
+    const lis = sec.querySelectorAll('li');
+    const arr = Array.from(lis).map(li => li.textContent.trim());
+    if (isExclude) data.costs.excluded = arr;
+    else data.costs.included = arr;
+  });
+  // 读取注意事项
+  const tipEls = document.querySelectorAll('.tips-list li span[contenteditable]');
+  if (tipEls.length) data.tips = Array.from(tipEls).map(e => e.textContent.trim());
+  // 透传新模块数据
+  if (tripData.flights) data.flights = tripData.flights;
+  if (tripData.photography) data.photography = tripData.photography;
+  if (tripData.restaurants) data.restaurants = tripData.restaurants;
+  if (tripData.souvenirs) data.souvenirs = tripData.souvenirs;
+  return data;
+}
+
+async function saveData() {
+  const data = collectData();
+  const jsonStr = JSON.stringify(data, null, 2);
+
+  try {
+    const resp = await fetch('/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: jsonStr
+    });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+      showToast('保存成功', '#10b981');
+    } else {
+      showToast('保存失败: ' + result.message, '#ef4444');
+    }
+  } catch (e) {
+    // 如果服务不可用（直接打开文件而非通过 serve），降级为下载
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tripData.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已下载 tripData.json（未检测到预览服务）', '#f59e0b');
+  }
+}
+
+function showToast(msg, color) {
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  toast.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:' + color + ';color:#fff;padding:8px 20px;border-radius:20px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function exportPDF() {
+  // 临时退出编辑模式
+  const wasEditing = isEditing;
+  if (wasEditing) toggleEdit();
+  window.print();
+  if (wasEditing) setTimeout(() => toggleEdit(), 500);
+}
+
+/* ========== 备选图片面板 ========== */
+function showAltPanel(targetImg, alts, altBtn) {
+  const overlay = document.createElement('div');
+  overlay.className = 'alt-panel-overlay';
+  overlay.innerHTML = `
+    <div class="alt-panel">
+      <div class="alt-panel-title">
+        <span>选择备选图片</span>
+        <button class="alt-panel-close">&times;</button>
+      </div>
+      <div class="alt-panel-grid">
+        ${alts.map(url => `<img src="${esc(url)}" alt="备选图片">`).join('')}
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <button class="alt-local-btn">从本地选择图片</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  // 关闭面板
+  overlay.querySelector('.alt-panel-close').onclick = () => overlay.remove();
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+  // 选择图片
+  overlay.querySelectorAll('.alt-panel-grid img').forEach(img => {
+    img.onclick = () => {
+      const wrapper = targetImg ? targetImg.closest('.img-wrapper') : null;
+      if (targetImg && targetImg.tagName === 'IMG') {
+        targetImg.src = img.src;
+      } else if (wrapper) {
+        // 如果之前是占位符，创建 img 元素替换
+        const placeholder = wrapper.querySelector('[class$="-placeholder"]');
+        if (placeholder) {
+          const newImg = document.createElement('img');
+          newImg.src = img.src;
+          newImg.className = placeholder.className.replace('-placeholder', '');
+          newImg.alt = '';
+          wrapper.replaceChild(newImg, placeholder);
+        }
+      }
+      overlay.remove();
+    };
+  });
+
+  // 从本地选择图片
+  overlay.querySelector('.alt-local-btn').onclick = function() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (targetImg && targetImg.tagName === 'IMG') {
+          targetImg.src = e.target.result;
+        } else {
+          // 处理占位符情况：创建 img 替换
+          const wrapper = altBtn ? altBtn.closest('.img-wrapper') : null;
+          if (wrapper) {
+            const placeholder = wrapper.querySelector('[class$="-placeholder"]');
+            if (placeholder) {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = placeholder.className.replace('-placeholder', '');
+              img.alt = '';
+              wrapper.insertBefore(img, placeholder);
+              placeholder.remove();
+            }
+          }
+        }
+        overlay.remove();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+}
+
+// 事件委托：监听备选按钮点击
+document.addEventListener('click', function(e) {
+  if (!isEditing) return;
+  const altBtn = e.target.closest('.img-alt-btn');
+  if (altBtn) {
+    e.stopPropagation();
+    e.preventDefault();
+    const alts = JSON.parse(altBtn.dataset.alts || '[]');
+    const wrapper = altBtn.closest('.img-wrapper');
+    const targetImg = wrapper.querySelector('img') || wrapper.querySelector('[class$="-placeholder"]');
+    showAltPanel(targetImg, alts, altBtn);
+  }
+});
+
+/* ========== 初始化渲染 ========== */
+renderCover();
+renderFlights();
+renderHighlights();
+renderOverview();
+renderDaily();
+renderVehicles();
+renderPhotography();
+renderHotels();
+renderFoods();
+renderRestaurants();
+renderSouvenirs();
+renderCosts();
+renderTips();
+</script>
+</body>
+</html>

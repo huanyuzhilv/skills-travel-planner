@@ -1,0 +1,21 @@
+# 新路书产出目录（内容不入库，仅保留目录占位）
+generated-roadbooks/*
+!generated-roadbooks/.gitkeep
+
+.claude/
+.superpowers/
+node_modules/
+__pycache__/
+*.pyc
+.xhs-mcp.pid
+.xhs-mcp.log
+.xhs-cookies.json
+
+# 本地密钥（OPENAI / FlyAI 等）
+.env
+.env.*
+!.env.example
+
+# 视觉去重 / 配图元数据缓存（ROADBOOK_IMAGE_CACHE_ROOT，默认仓库下 cache/）
+cache/images/
+cache/metadata/

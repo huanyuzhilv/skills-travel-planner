@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "tikhub-xhs": {
+      "command": "./scripts/tikhub_mcp_stdio.sh"
+    }
+  }
+}
