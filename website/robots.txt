@@ -1,0 +1,43 @@
+# skills-travel-planner — allow all crawlers including AI bots
+
+User-agent: *
+Allow: /
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Google (incl. Gemini training opt-in bot)
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+# Anthropic / Claude
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Perplexity, Meta, others commonly used by AI search
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+# LLM-readable summary
+# See also: /llms.txt
+
+Sitemap: https://huanyuzhilv.github.io/skills-travel-planner/sitemap.xml
