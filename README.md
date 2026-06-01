@@ -1,5 +1,9 @@
 # skills-travel-planner — 开源 AI 路书生成工具
 
+> **English:** Open-source **AI roadbook / travel itinerary generator** for **Cursor, Claude Code & Codex** agents.  
+> Converts txt/docx itinerary briefs → structured **`tripData.json`** → **client-ready HTML/PDF roadbooks** with Xiaohongshu image enrichment, optional LLM copywriting, and FlyAI hotel data.  
+> **One-command deliver:** `python3 scripts/deliver_roadbook_v2.py tripData.json output.html --check-in YYYY-MM-DD --check-out YYYY-MM-DD`
+
 面向定制游顾问与 **AI Agent（Cursor / Claude Code / Codex）** 的专业 **路书（Roadbook）生成 Skill**。  
 把 txt/docx/截图里的简版行程，自动变成结构化 **`tripData.json`** 与客户可交付的 **HTML/PDF 路书**。
 
@@ -7,6 +11,17 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-GitHub%20Pages-646cff)](https://huanyuzhilv.github.io/skills-travel-planner/)
+[![Release](https://img.shields.io/github/v/release/huanyuzhilv/skills-travel-planner?label=release)](https://github.com/huanyuzhilv/skills-travel-planner/releases)
+
+## 与其他方案对比
+
+| | **skills-travel-planner** | ChatGPT 聊行程 | Word/Notion 模板 | 通用 trip planner App |
+|---|---|---|---|---|
+| **输出** | `tripData.json` + 交付级 HTML/PDF | 纯文本 | 手工排版 | App 内行程 |
+| **Agent 集成** | Cursor / Claude Skill 原生 | 无 Skill 规范 | 无 | 无 |
+| **配图** | 小红书 + 飞猪自动搜图 | 无或手动 | 手动 | 有限 |
+| **一键交付流水线** | `deliver_roadbook_v2.py` | 无 | 无 | 无 |
+| **开源可 fork** | MIT | 否 | 否 | 否 |
 
 ## 特性
 

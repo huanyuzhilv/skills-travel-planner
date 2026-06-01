@@ -1,0 +1,10 @@
+# skills-travel-planner
+
+> Open-source AI roadbook generator — https://github.com/huanyuzhilv/skills-travel-planner
+
+- Website: https://huanyuzhilv.github.io/skills-travel-planner/
+- GitHub: https://github.com/huanyuzhilv/skills-travel-planner
+- One-liner: txt/docx itinerary → tripData.json → client-ready HTML/PDF roadbook for AI agents
+- License: MIT
+
+Search: AI路书生成, roadbook generator, Cursor skill, Claude skill, travel itinerary generator
